@@ -1,0 +1,135 @@
+site_name: Nathan-Dash
+site_description: Documentation complète pour installer et gérer ton dashboard Discord Bot Manager
+site_url: https://jefedi.github.io/Nathan-dash/
+repo_url: https://github.com/Jefedi/Nathan-dash
+repo_name: Jefedi/Nathan-dash
+edit_uri: ""
+
+theme:
+  name: material
+  language: fr
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  custom_dir: docs/overrides
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      note: fontawesome/solid/note-sticky
+      tip: fontawesome/solid/lightbulb
+      warning: fontawesome/solid/triangle-exclamation
+
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - navigation.path
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+
+plugins:
+  - search:
+      lang: fr
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Jefedi/Nathan-dash
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Accueil: index.md
+  - Guide d'installation:
+      - installation/index.md
+      - Prérequis: installation/prerequis.md
+      - Installation rapide: installation/one-liner.md
+      - Installation manuelle: installation/manuelle.md
+      - Configuration: installation/configuration.md
+  - Utilisation:
+      - utilisation/index.md
+      - Dashboard: utilisation/dashboard.md
+      - Gestion des bots: utilisation/bots.md
+      - Logs & monitoring: utilisation/logs.md
+  - Déploiement:
+      - deploiement/index.md
+      - Docker: deploiement/docker.md
+      - Auto-update: deploiement/auto-update.md
+      - GitHub Pages: deploiement/github-pages.md
+  - FAQ: faq.md
