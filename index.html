@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nathan-dash</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #12121a;
+      --bg3: #1a1a26;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8e8f0;
+      --text2: #8888aa;
+      --accent: #7c6fff;
+      --accent2: #ff6f91;
+      --green: #4fffb0;
+      --red: #ff4f6f;
+      --amber: #ffb84f;
+      --radius: 14px;
+      --font: 'Space Grotesk', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    [data-theme="light"] {
+      --bg: #f0f0f8;
+      --bg2: #ffffff;
+      --bg3: #e8e8f5;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1a2e;
+      --text2: #6666aa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Background animated grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,111,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,111,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 20s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridMove {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(40px); }
+    }
+
+    /* Glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+    .orb1 { width: 400px; height: 400px; background: rgba(124,111,255,0.12); top: -100px; right: -100px; }
+    .orb2 { width: 300px; height: 300px; background: rgba(255,111,145,0.08); bottom: -50px; left: -50px; animation-delay: -4s; }
+    @keyframes orbFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* Login container */
+    .login-wrap {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      animation: fadeUp 0.6s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 36px;
+      justify-content: center;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -1px;
+      box-shadow: 0 0 30px rgba(124,111,255,0.4);
+    }
+    .logo-text { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--accent); }
+
+    /* Card */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .card h2 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+    .card p { color: var(--text2); font-size: 13px; margin-bottom: 28px; }
+
+    /* Form */
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,111,255,0.15);
+    }
+    .field input::placeholder { color: var(--text2); }
+
+    /* Button */
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--accent), #9b8fff);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+      margin-top: 8px;
+      box-shadow: 0 4px 20px rgba(124,111,255,0.4);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(124,111,255,0.5); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* Theme toggle */
+    .theme-btn {
+      position: fixed;
+      top: 20px; right: 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+      z-index: 100;
+    }
+    .theme-btn:hover { background: var(--bg3); }
+
+    /* Error message */
+    .error-msg {
+      background: rgba(255,79,111,0.1);
+      border: 1px solid rgba(255,79,111,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--red);
+      margin-bottom: 16px;
+      display: none;
+      font-family: var(--mono);
+    }
+    .error-msg.show { display: block; }
+
+    /* Dashboard (hidden by default) */
+    .dashboard { display: none; }
+    .dashboard.active {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 200;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: 220px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 300;
+    }
+    .sidebar .logo { padding: 0 20px 24px; margin: 0; border-bottom: 1px solid var(--border); justify-content: flex-start; }
+    .nav-section { padding: 16px 12px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px;
+      font-size: 13px; font-weight: 500;
+      color: var(--text2);
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 1px 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: rgba(124,111,255,0.15); color: var(--accent); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* Main content */
+    .main {
+      margin-left: 220px;
+      padding: 32px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .topbar h1 { font-size: 22px; font-weight: 700; }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+    .badge-green { background: rgba(79,255,176,0.1); color: var(--green); border: 1px solid rgba(79,255,176,0.2); }
+    .badge-red { background: rgba(255,79,111,0.1); color: var(--red); border: 1px solid rgba(255,79,111,0.2); }
+
+    /* Grid cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .stat-card .label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; font-family: var(--mono); }
+    .stat-card .sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+    .accent-purple { color: var(--accent); }
+    .accent-green { color: var(--green); }
+    .accent-red { color: var(--red); }
+    .accent-amber { color: var(--amber); }
+
+    /* Module cards */
+    .modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .module-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .module-card:hover { border-color: var(--accent); background: var(--bg3); transform: translateY(-2px); }
+    .module-card .m-icon { font-size: 28px; margin-bottom: 10px; }
+    .module-card .m-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .module-card .m-desc { font-size: 10px; color: var(--text2); }
+
+    /* Status bar */
+    .statusbar {
+      position: fixed;
+      bottom: 0; left: 220px; right: 0;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 6px 20px;
+      display: flex; align-items: center; gap: 16px;
+      font-size: 11px; color: var(--text2);
+      font-family: var(--mono);
+      z-index: 100;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+  </style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- Theme toggle -->
+<button class="theme-btn" onclick="toggleTheme()" title="Changer le thème">🌙</button>
+
+<!-- Login -->
+<div class="login-wrap" id="loginPage">
+  <div class="logo">
+    <div class="logo-icon">N</div>
+    <div class="logo-text">Nathan<span>dash</span></div>
+  </div>
+  <div class="card">
+    <h2>Connexion</h2>
+    <p>Accédez à votre tableau de bord</p>
+    <div class="error-msg" id="errorMsg">⚠ Identifiants incorrects</div>
+    <div class="field">
+      <label>Utilisateur</label>
+      <input type="text" id="username" placeholder="votre identifiant" />
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()" />
+    </div>
+    <button class="btn-primary" onclick="login()">Se connecter</button>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboard">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">Nathan<span>dash</span></div>
+    </div>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active"><span class="icon">⚡</span> Dashboard</div>
+    <div class="nav-item"><span class="icon">🤖</span> Assistant IA</div>
+    <div class="nav-item"><span class="icon">📝</span> Notes</div>
+    <div class="nav-item"><span class="icon">📁</span> Fichiers</div>
+    <div class="nav-item"><span class="icon">✅</span> Tâches</div>
+    <div class="nav-section">Outils</div>
+    <div class="nav-item"><span class="icon">🔐</span> Mots de passe</div>
+    <div class="nav-item"><span class="icon">🧮</span> Calculatrice</div>
+    <div class="nav-item"><span class="icon">🌐</span> Traducteur</div>
+    <div class="nav-section">Discord</div>
+    <div class="nav-item"><span class="icon">💬</span> Bot nathanfr3</div>
+    <div class="nav-item"><span class="icon">📊</span> Serveurs</div>
+    <div class="nav-section">Système</div>
+    <div class="nav-item"><span class="icon">🛡️</span> Sécurité</div>
+    <div class="nav-item"><span class="icon">📈</span> Performance</div>
+    <div class="nav-item" onclick="logout()"><span class="icon">🚪</span> Déconnexion</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Tableau de bord</h1>
+      <div class="topbar-actions">
+        <span class="badge badge-green">● En ligne</span>
+        <button class="theme-btn" style="position:relative;top:auto;right:auto;" onclick="toggleTheme()">🌙</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="stat-card">
+        <div class="label">Fichiers</div>
+        <div class="value accent-purple">24</div>
+        <div class="sub">+3 aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Tâches actives</div>
+        <div class="value accent-green">7</div>
+        <div class="sub">2 urgentes</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Bot Discord</div>
+        <div class="value accent-green">ON</div>
+        <div class="sub">nathanfr3 actif</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Menaces bloquées</div>
+        <div class="value accent-red">0</div>
+        <div class="sub">Système sûr</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Sync GitHub</div>
+        <div class="value accent-amber">Auto</div>
+        <div class="sub">Toutes les 30s</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px; font-size:13px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px;">Modules</div>
+    <div class="modules">
+      <div class="module-card"><div class="m-icon">🤖</div><div class="m-name">Assistant IA</div><div class="m-desc">Claude AI intégré</div></div>
+      <div class="module-card"><div class="m-icon">📝</div><div class="m-name">Notes</div><div class="m-desc">Éditeur complet</div></div>
+      <div class="module-card"><div class="m-icon">📁</div><div class="m-name">Fichiers</div><div class="m-desc">Explorateur</div></div>
+      <div class="module-card"><div class="m-icon">✅</div><div class="m-name">Tâches</div><div class="m-desc">Gestionnaire</div></div>
+      <div class="module-card"><div class="m-icon">🔐</div><div class="m-name">Passwords</div><div class="m-desc">Coffre-fort</div></div>
+      <div class="module-card"><div class="m-icon">🧮</div><div class="m-name">Calculatrice</div><div class="m-desc">Scientifique</div></div>
+      <div class="module-card"><div class="m-icon">🌐</div><div class="m-name">Traducteur</div><div class="m-desc">Multilingue</div></div>
+      <div class="module-card"><div class="m-icon">💬</div><div class="m-name">Bot Discord</div><div class="m-desc">nathanfr3</div></div>
+      <div class="module-card"><div class="m-icon">🛡️</div><div class="m-name">Antivirus</div><div class="m-desc">Protection</div></div>
+      <div class="module-card"><div class="m-icon">📈</div><div class="m-name">Performance</div><div class="m-desc">Analyse système</div></div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div class="status-dot"></div>
+    <span>Nathan-dash v1.0</span>
+    <span>|</span>
+    <span id="clock"></span>
+    <span>|</span>
+    <span>GitHub: sync actif</span>
+    <span>|</span>
+    <span>Bot: en ligne</span>
+  </div>
+</div>
+
+<script>
+  function login() {
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    if (u === 'nathan' && p === 'nathan123') {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').classList.add('active');
+    } else {
+      document.getElementById('errorMsg').classList.add('show');
+    }
+  }
+
+  function logout() {
+    document.getElementById('dashboard').classList.remove('active');
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.querySelectorAll('.theme-btn').forEach(b => b.textContent = isDark ? '🌙' : '☀️');
+  }
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR');
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Nav items
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

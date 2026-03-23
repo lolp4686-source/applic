@@ -1,0 +1,17 @@
+# ══════════════════════════════════════════
+#  NATHAN-DASH — Configuration
+#  NE JAMAIS PARTAGER CE FICHIER
+# ══════════════════════════════════════════
+
+# Token du bot Discord (ne jamais modifier la clé, seulement la valeur)
+DISCORD_TOKEN=MTQ4NTQxOTMzMjAxMDkwMTU5NQ.GWTUjq.apfcBPU9V3YCN1AzGjivmm-URSUuODwhJ1pdko
+
+# Client ID du bot (pour enregistrer les slash commands)
+# Trouvez-le sur discord.com/developers > votre app > General Information > Application ID
+CLIENT_ID=1485419332010901595
+
+# Préfixe des commandes legacy (optionnel)
+PREFIX=!
+
+# Claude AI (pour plus tard)
+CLAUDE_API_KEY=VotreClefClaudeIci

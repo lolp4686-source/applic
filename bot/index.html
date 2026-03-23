@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nathan-dash</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--border:rgba(255,255,255,0.08);--text:#e8e8f0;--text2:#8888aa;--accent:#7c6fff;--accent2:#ff6f91;--green:#4fffb0;--red:#ff4f6f;--amber:#ffb84f;--discord:#5865F2;--radius:14px;--font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;}
+    [data-theme="light"]{--bg:#f0f0f8;--bg2:#ffffff;--bg3:#e8e8f5;--border:rgba(0,0,0,0.08);--text:#1a1a2e;--text2:#6666aa;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;}
+    .login-page{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:var(--bg);}
+    .login-page::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,111,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,255,0.03) 1px,transparent 1px);background-size:40px 40px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;animation:orbFloat 8s ease-in-out infinite;}
+    .orb1{width:400px;height:400px;background:rgba(124,111,255,0.12);top:-100px;right:-100px;}
+    .orb2{width:300px;height:300px;background:rgba(255,111,145,0.08);bottom:-50px;left:-50px;animation-delay:-4s;}
+    @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+    .login-wrap{position:relative;z-index:10;width:100%;max-width:420px;padding:20px;animation:fadeUp 0.6s ease forwards;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .logo{display:flex;align-items:center;gap:12px;margin-bottom:36px;justify-content:center;}
+    .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:white;box-shadow:0 0 30px rgba(124,111,255,0.4);}
+    .logo-text{font-size:22px;font-weight:700;letter-spacing:-0.5px;}
+    .logo-text span{color:var(--accent);}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+    .card h2{font-size:20px;font-weight:600;margin-bottom:6px;}
+    .card p{color:var(--text2);font-size:13px;margin-bottom:28px;}
+    .field{margin-bottom:16px;}
+    .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+    .field input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-family:var(--font);font-size:14px;color:var(--text);outline:none;transition:border-color 0.2s;}
+    .field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,111,255,0.15);}
+    .field input::placeholder{color:var(--text2);}
+    .btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#9b8fff);border:none;border-radius:10px;color:white;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;box-shadow:0 4px 20px rgba(124,111,255,0.4);transition:opacity 0.2s,transform 0.2s;}
+    .btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+    .error-msg{background:rgba(255,79,111,0.1);border:1px solid rgba(255,79,111,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:16px;display:none;font-family:var(--mono);}
+    .error-msg.show{display:block;}
+    .app{display:none;position:fixed;inset:0;}
+    .app.active{display:flex;animation:fadeIn 0.4s ease;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+    .sidebar .logo{padding:20px;border-bottom:1px solid var(--border);margin:0;justify-content:flex-start;}
+    .nav-section{padding:16px 12px 6px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text2);}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-radius:8px;margin:1px 8px;transition:background 0.15s,color 0.15s;user-select:none;}
+    .nav-item:hover{background:var(--bg3);color:var(--text);}
+    .nav-item.active{background:rgba(124,111,255,0.15);color:var(--accent);}
+    .nav-item .icon{font-size:16px;width:20px;text-align:center;}
+    .badge-soon{font-size:9px;background:rgba(124,111,255,0.15);color:var(--accent);border-radius:4px;padding:1px 5px;margin-left:auto;}
+    .badge-on{font-size:9px;background:rgba(79,255,176,0.15);color:var(--green);border-radius:4px;padding:1px 5px;margin-left:auto;}
+    .content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
+    .topbar h1{font-size:18px;font-weight:700;}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .badge-online{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:var(--mono);background:rgba(79,255,176,0.1);color:var(--green);border:1px solid rgba(79,255,176,0.2);}
+    .theme-btn{background:var(--bg3);border:1px solid var(--border);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;}
+    .page{display:none;flex:1;overflow-y:auto;padding:28px;}
+    .page.active{display:block;}
+    .section-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px;}
+    .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color 0.2s,transform 0.2s;}
+    .stat-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+    .stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+    .stat-value{font-size:28px;font-weight:700;font-family:var(--mono);}
+    .stat-sub{font-size:11px;color:var(--text2);margin-top:4px;}
+    .c-purple{color:var(--accent);}.c-green{color:var(--green);}.c-red{color:var(--red);}.c-amber{color:var(--amber);}.c-discord{color:var(--discord);}
+    .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+    .module-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:all 0.2s;}
+    .module-card:hover:not(.disabled){border-color:var(--accent);background:var(--bg3);transform:translateY(-2px);}
+    .module-card.disabled{opacity:0.4;cursor:not-allowed;}
+    .m-icon{font-size:26px;margin-bottom:8px;}
+    .m-name{font-size:12px;font-weight:600;margin-bottom:3px;}
+    .m-desc{font-size:10px;color:var(--text2);}
+    .m-badge{font-size:9px;background:rgba(255,184,79,0.15);color:var(--amber);border-radius:4px;padding:1px 6px;margin-top:5px;display:inline-block;}
+    /* TRADUCTEUR */
+    .lang-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+    .lang-select{flex:1;min-width:130px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;cursor:pointer;}
+    .swap-btn{background:var(--bg2);border:1px solid var(--border);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;transition:background 0.2s,transform 0.3s;}
+    .swap-btn:hover{background:var(--bg3);transform:rotate(180deg);}
+    .trad-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+    @media(max-width:700px){.trad-grid,.sec-grid,.discord-panels{grid-template-columns:1fr;}}
+    .text-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);}
+    .icon-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;color:var(--text2);}
+    .trad-textarea{width:100%;min-height:180px;background:transparent;border:none;outline:none;padding:14px;font-family:var(--font);font-size:14px;color:var(--text);resize:vertical;line-height:1.6;}
+    .trad-textarea::placeholder{color:var(--text2);}
+    .char-count{padding:6px 14px;font-size:11px;color:var(--text2);font-family:var(--mono);border-top:1px solid var(--border);text-align:right;}
+    .btn-translate{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#9b8fff);border:none;border-radius:10px;color:white;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:18px;transition:opacity 0.2s;}
+    .btn-translate:hover{opacity:0.9;}
+    .btn-translate:disabled{opacity:0.5;cursor:not-allowed;}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .phrases{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+    .phrase-btn{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-family:var(--font);font-size:12px;color:var(--text2);cursor:pointer;transition:all 0.15s;}
+    .phrase-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .trad-history{display:flex;flex-direction:column;gap:8px;}
+    .history-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:border-color 0.15s;}
+    .history-item:hover{border-color:var(--accent);}
+    .hist-langs{font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:3px;}
+    .hist-text{font-size:13px;color:var(--text);}
+    .hist-trad{font-size:12px;color:var(--accent);margin-top:2px;}
+    .error-box{background:rgba(255,79,111,0.1);border:1px solid rgba(255,79,111,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px;display:none;font-family:var(--mono);}
+    .error-box.show{display:block;}
+    /* DISCORD */
+    .discord-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+    .bot-info{display:flex;align-items:center;gap:12px;}
+    .bot-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--discord),#7289da);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white;}
+    .guilds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px;}
+    .guild-card{background:var(--bg2);border:2px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;}
+    .guild-card:hover{border-color:var(--discord);transform:translateY(-2px);}
+    .guild-card.active-guild{border-color:var(--discord);background:rgba(88,101,242,0.08);}
+    .guild-icon-placeholder{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--discord),#7289da);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:white;flex-shrink:0;}
+    .guild-info{flex:1;min-width:0;}
+    .guild-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .guild-members{font-size:11px;color:var(--text2);margin-top:2px;}
+    .guild-detail{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+    .guild-detail-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+    .guild-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+    .guild-stat{text-align:center;padding:16px 8px;border-right:1px solid var(--border);}
+    .guild-stat:last-child{border-right:none;}
+    .guild-stat-value{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--accent);}
+    .guild-stat-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+    .discord-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+    .discord-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .discord-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;}
+    .refresh-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:15px;transition:transform 0.3s,color 0.2s;}
+    .refresh-btn:hover{transform:rotate(180deg);color:var(--accent);}
+    .log-list{padding:12px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+    .log-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;background:var(--bg3);font-size:12px;}
+    .log-content{flex:1;}
+    .log-title{font-weight:600;color:var(--text);margin-bottom:2px;}
+    .log-time{font-size:10px;color:var(--text2);font-family:var(--mono);}
+    .log-item.raid{border-left:3px solid var(--red);}
+    .log-item.spam{border-left:3px solid var(--amber);}
+    .log-item.join{border-left:3px solid var(--green);}
+    .log-item.ban{border-left:3px solid var(--red);}
+    .log-item.leave{border-left:3px solid var(--amber);}
+    .log-item.info{border-left:3px solid var(--discord);}
+    .member-list{padding:12px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+    .member-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:var(--bg3);font-size:12px;}
+    .member-avatar-ph{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+    .member-dot{margin-left:auto;width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+    .backend-alert{background:rgba(255,184,79,0.1);border:1px solid rgba(255,184,79,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:16px;font-family:var(--mono);}
+    /* ══════════════════════════════════
+       SÉCURITÉ
+    ══════════════════════════════════ */
+    .sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+    .sec-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .sec-card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+    .sec-card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+    .sec-card-body{padding:16px 18px;}
+    /* Toggle switch */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+    .toggle-row:last-child{border-bottom:none;}
+    .toggle-label{display:flex;flex-direction:column;gap:2px;}
+    .toggle-label span{font-size:11px;color:var(--text2);}
+    .toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:11px;transition:0.3s;}
+    .toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
+    .toggle input:checked+.toggle-slider{background:var(--accent);}
+    .toggle input:checked+.toggle-slider:before{transform:translateX(18px);}
+    /* Protection status */
+    .prot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+    .prot-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;transition:border-color 0.2s;}
+    .prot-card.active{border-color:var(--green);}
+    .prot-card.warning{border-color:var(--amber);}
+    .prot-card.inactive{border-color:var(--red);}
+    .prot-icon{font-size:24px;margin-bottom:8px;}
+    .prot-name{font-size:12px;font-weight:600;margin-bottom:4px;}
+    .prot-status{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:10px;display:inline-block;}
+    .prot-status.on{background:rgba(79,255,176,0.1);color:var(--green);}
+    .prot-status.off{background:rgba(255,79,111,0.1);color:var(--red);}
+    .prot-status.warn{background:rgba(255,184,79,0.1);color:var(--amber);}
+    /* Threat log */
+    .threat-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;}
+    .threat-item:last-child{border-bottom:none;}
+    .threat-badge{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;font-family:var(--mono);flex-shrink:0;}
+    .threat-badge.critical{background:rgba(255,79,111,0.15);color:var(--red);}
+    .threat-badge.high{background:rgba(255,184,79,0.15);color:var(--amber);}
+    .threat-badge.medium{background:rgba(124,111,255,0.15);color:var(--accent);}
+    .threat-badge.low{background:rgba(79,255,176,0.15);color:var(--green);}
+    .threat-content{flex:1;}
+    .threat-title{font-weight:600;color:var(--text);margin-bottom:2px;}
+    .threat-detail{color:var(--text2);}
+    .threat-time{font-size:10px;color:var(--text2);font-family:var(--mono);margin-top:2px;}
+    /* Banned words */
+    .word-list{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;}
+    .word-tag{background:rgba(255,79,111,0.1);border:1px solid rgba(255,79,111,0.2);color:var(--red);border-radius:6px;padding:3px 10px;font-size:12px;font-family:var(--mono);display:flex;align-items:center;gap:6px;}
+    .word-tag button{background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;line-height:1;padding:0;}
+    .word-input-row{display:flex;gap:8px;padding:0 16px 14px;}
+    .word-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;}
+    .word-input:focus{border-color:var(--red);}
+    .btn-add-word{padding:8px 14px;background:rgba(255,79,111,0.15);border:1px solid rgba(255,79,111,0.3);border-radius:8px;color:var(--red);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+    .btn-add-word:hover{background:rgba(255,79,111,0.25);}
+    /* IP / connexions */
+    .conn-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}
+    .conn-item:last-child{border-bottom:none;}
+    .conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    /* Audit trail */
+    .audit-item{display:flex;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}
+    .audit-item:last-child{border-bottom:none;}
+    .audit-user{font-weight:600;color:var(--accent);min-width:80px;}
+    .audit-action{color:var(--text);flex:1;}
+    .audit-time{color:var(--text2);font-family:var(--mono);font-size:10px;flex-shrink:0;}
+    /* Score sécurité */
+    .score-wrap{display:flex;align-items:center;gap:20px;padding:16px 18px;}
+    .score-circle{width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--green) 0% 72%,var(--border) 72% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+    .score-inner{width:60px;height:60px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green);}
+    .score-details{flex:1;}
+    .score-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+    .score-sub{font-size:12px;color:var(--text2);}
+    .score-bar-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+    .score-bar-label{font-size:11px;color:var(--text2);width:80px;flex-shrink:0;}
+    .score-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+    .score-bar-fill{height:100%;border-radius:3px;transition:width 0.5s;}
+    /* STATUSBAR */
+    .statusbar{background:var(--bg2);border-top:1px solid var(--border);padding:5px 20px;display:flex;align-items:center;gap:16px;font-size:11px;color:var(--text2);font-family:var(--mono);flex-shrink:0;}
+    .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+    /* Alerts */
+    .alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);}
+    .alert-item:last-child{border-bottom:none;}
+    .alert-icon{font-size:18px;flex-shrink:0;}
+    .alert-content{flex:1;}
+    .alert-title{font-size:13px;font-weight:600;color:var(--text);}
+    .alert-desc{font-size:11px;color:var(--text2);margin-top:2px;}
+    .alert-time{font-size:10px;color:var(--text2);font-family:var(--mono);}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="loginPage">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="login-wrap">
+    <div class="logo"><div class="logo-icon">N</div><div class="logo-text">Nathan<span>dash</span></div></div>
+    <div class="card">
+      <h2>Connexion</h2><p>Accédez à votre tableau de bord</p>
+      <div class="error-msg" id="errorMsg">⚠ Identifiants incorrects</div>
+      <div class="field"><label>Utilisateur</label><input type="text" id="username" placeholder="nathan"/></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()"/></div>
+      <button class="btn-primary" onclick="login()">Se connecter</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="logo"><div class="logo-icon">N</div><div class="logo-text">Nathan<span>dash</span></div></div>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="goTo('dashboard',this)"><span class="icon">⚡</span> Dashboard</div>
+    <div class="nav-item" onclick="goTo('traducteur',this)"><span class="icon">🌐</span> Traducteur</div>
+    <div class="nav-item" onclick="goTo('ia',this)"><span class="icon">🤖</span> Assistant IA <span class="badge-soon">bientôt</span></div>
+    <div class="nav-item" onclick="goTo('notes',this)"><span class="icon">📝</span> Notes <span class="badge-soon">bientôt</span></div>
+    <div class="nav-item" onclick="goTo('fichiers',this)"><span class="icon">📁</span> Fichiers <span class="badge-soon">bientôt</span></div>
+    <div class="nav-item" onclick="goTo('taches',this)"><span class="icon">✅</span> Tâches <span class="badge-soon">bientôt</span></div>
+    <div class="nav-section">Outils</div>
+    <div class="nav-item" onclick="goTo('passwords',this)"><span class="icon">🔐</span> Passwords <span class="badge-soon">bientôt</span></div>
+    <div class="nav-item" onclick="goTo('calc',this)"><span class="icon">🧮</span> Calculatrice <span class="badge-soon">bientôt</span></div>
+    <div class="nav-section">Discord</div>
+    <div class="nav-item" onclick="goTo('discord',this)"><span class="icon">💬</span> Bot nathanfr3 <span class="badge-on">ON</span></div>
+    <div class="nav-section">Système</div>
+    <div class="nav-item" onclick="goTo('securite',this)"><span class="icon">🛡️</span> Sécurité</div>
+    <div class="nav-item" onclick="logout()"><span class="icon">🚪</span> Déconnexion</div>
+  </div>
+
+  <div class="content">
+    <div class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="topbar-right">
+        <span class="badge-online" id="backendStatus">● Connexion...</span>
+        <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" onclick="goTo('traducteur',null)"><div class="stat-label">Traducteur</div><div class="stat-value c-purple">11</div><div class="stat-sub">langues</div></div>
+        <div class="stat-card" onclick="goTo('discord',null)"><div class="stat-label">Bot Discord</div><div class="stat-value c-green">ON</div><div class="stat-sub">nathanfr3</div></div>
+        <div class="stat-card" onclick="goTo('securite',null)"><div class="stat-label">Score sécurité</div><div class="stat-value c-green" id="dashScore">72</div><div class="stat-sub">/ 100</div></div>
+        <div class="stat-card" onclick="goTo('securite',null)"><div class="stat-label">Menaces</div><div class="stat-value c-red" id="dashThreats">0</div><div class="stat-sub">aujourd'hui</div></div>
+        <div class="stat-card"><div class="stat-label">Sync GitHub</div><div class="stat-value c-amber">Auto</div><div class="stat-sub">30s</div></div>
+      </div>
+      <div class="section-label">Modules</div>
+      <div class="modules-grid">
+        <div class="module-card" onclick="goTo('traducteur',null)"><div class="m-icon">🌐</div><div class="m-name">Traducteur</div><div class="m-desc">11 langues</div></div>
+        <div class="module-card" onclick="goTo('discord',null)"><div class="m-icon">💬</div><div class="m-name">Bot Discord</div><div class="m-desc">nathanfr3</div></div>
+        <div class="module-card" onclick="goTo('securite',null)"><div class="m-icon">🛡️</div><div class="m-name">Sécurité</div><div class="m-desc">Protection complète</div></div>
+        <div class="module-card disabled"><div class="m-icon">🤖</div><div class="m-name">Assistant IA</div><div class="m-desc">Claude AI</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">📝</div><div class="m-name">Notes</div><div class="m-desc">Éditeur</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">📁</div><div class="m-name">Fichiers</div><div class="m-desc">Explorateur</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">✅</div><div class="m-name">Tâches</div><div class="m-desc">Gestionnaire</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">🔐</div><div class="m-name">Passwords</div><div class="m-desc">Coffre-fort</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">🧮</div><div class="m-name">Calculatrice</div><div class="m-desc">Scientifique</div><div class="m-badge">bientôt</div></div>
+      </div>
+    </div>
+
+    <!-- TRADUCTEUR -->
+    <div class="page" id="page-traducteur">
+      <div class="lang-bar">
+        <select class="lang-select" id="sourceLang"><option value="fr">🇫🇷 Français</option><option value="en">🇬🇧 Anglais</option><option value="es">🇪🇸 Espagnol</option><option value="de">🇩🇪 Allemand</option><option value="it">🇮🇹 Italien</option><option value="pt">🇵🇹 Portugais</option><option value="ru">🇷🇺 Russe</option><option value="zh">🇨🇳 Chinois</option><option value="ja">🇯🇵 Japonais</option><option value="ar">🇸🇦 Arabe</option><option value="tr">🇹🇷 Turc</option></select>
+        <button class="swap-btn" onclick="swapLangs()">⇄</button>
+        <select class="lang-select" id="targetLang"><option value="en">🇬🇧 Anglais</option><option value="fr">🇫🇷 Français</option><option value="es">🇪🇸 Espagnol</option><option value="de">🇩🇪 Allemand</option><option value="it">🇮🇹 Italien</option><option value="pt">🇵🇹 Portugais</option><option value="ru">🇷🇺 Russe</option><option value="zh">🇨🇳 Chinois</option><option value="ja">🇯🇵 Japonais</option><option value="ar">🇸🇦 Arabe</option><option value="tr">🇹🇷 Turc</option></select>
+      </div>
+      <div class="trad-grid">
+        <div class="text-panel"><div class="panel-head"><span>Texte source</span><div style="display:flex;gap:4px"><button class="icon-btn" onclick="clearTrad()">✕</button><button class="icon-btn" onclick="copyTrad('sourceText')">📋</button></div></div><textarea class="trad-textarea" id="sourceText" placeholder="Tapez votre texte..." oninput="updateCharCount()"></textarea><div class="char-count"><span id="charCount">0</span> caractères</div></div>
+        <div class="text-panel"><div class="panel-head"><span>Traduction</span><button class="icon-btn" onclick="copyTrad('resultText')">📋</button></div><textarea class="trad-textarea" id="resultText" placeholder="La traduction apparaîtra ici..." readonly></textarea><div class="char-count" id="resultCount">—</div></div>
+      </div>
+      <div class="error-box" id="errorBox">❌ Erreur. Vérifiez votre connexion.</div>
+      <button class="btn-translate" id="translateBtn" onclick="doTranslate()">🌐 Traduire</button>
+      <div class="section-label">Phrases rapides</div>
+      <div class="phrases"><button class="phrase-btn" onclick="quickPhrase('Bonjour, comment allez-vous ?')">Bonjour</button><button class="phrase-btn" onclick="quickPhrase('Merci beaucoup !')">Merci</button><button class="phrase-btn" onclick="quickPhrase('Je ne comprends pas')">Pas compris</button><button class="phrase-btn" onclick="quickPhrase('Combien ça coûte ?')">Prix</button><button class="phrase-btn" onclick="quickPhrase('Appelez la police !')">Urgence</button></div>
+      <div class="section-label">Historique</div>
+      <div class="trad-history" id="tradHistory"><div style="font-size:12px;color:var(--text2)">Aucune traduction.</div></div>
+    </div>
+
+    <!-- DISCORD -->
+    <div class="page" id="page-discord">
+      <div id="backendAlert" class="backend-alert" style="display:none">⚠ Backend non détecté — lancez <strong>node server.js</strong> dans bot/</div>
+      <div class="discord-top">
+        <div class="bot-info"><div class="bot-avatar">N</div><div><div style="font-size:13px;font-weight:600" id="botTagDisplay">Nathanfr3</div><div style="font-size:11px;color:var(--green)" id="botPingDisplay">Ping: —</div></div></div>
+        <button onclick="loadGuilds()" style="background:var(--discord);border:none;border-radius:8px;padding:8px 16px;color:white;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;">↻ Actualiser</button>
+      </div>
+      <div class="section-label">Serveurs</div>
+      <div class="guilds-grid" id="guildsGrid"><div style="font-size:12px;color:var(--text2)">Chargement...</div></div>
+      <div id="guildDetail" style="display:none">
+        <div class="guild-detail"><div class="guild-detail-head"><div style="font-size:15px;font-weight:700" id="selectedGuildName">—</div><button class="refresh-btn" onclick="loadSelectedGuild()">↻</button></div><div class="guild-stats-row"><div class="guild-stat"><div class="guild-stat-value" id="guildStatMembers">—</div><div class="guild-stat-label">Membres</div></div><div class="guild-stat"><div class="guild-stat-value" id="guildStatOnline">—</div><div class="guild-stat-label">En ligne</div></div><div class="guild-stat"><div class="guild-stat-value" id="guildStatChannels">—</div><div class="guild-stat-label">Salons</div></div><div class="guild-stat"><div class="guild-stat-value" id="guildStatRoles">—</div><div class="guild-stat-label">Rôles</div></div></div></div>
+        <div class="discord-panels"><div class="discord-panel"><div class="discord-panel-head">🛡️ Logs <button class="refresh-btn" onclick="loadSelectedLogs()">↻</button></div><div class="log-list" id="selectedLogList"><div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Chargement...</div></div></div><div class="discord-panel"><div class="discord-panel-head">👥 Membres <button class="refresh-btn" onclick="loadSelectedMembers()">↻</button></div><div class="member-list" id="selectedMemberList"><div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Chargement...</div></div></div></div>
+        <div class="section-label">Protection</div>
+        <div class="stats-grid"><div class="stat-card"><div class="stat-label">Anti-raid</div><div class="stat-value c-green">ON</div><div class="stat-sub">10 joins/10s</div></div><div class="stat-card"><div class="stat-label">Anti-spam</div><div class="stat-value c-green">ON</div><div class="stat-sub">7 msg/5s</div></div><div class="stat-card"><div class="stat-label">Auto-ban</div><div class="stat-value c-green">ON</div><div class="stat-sub">Comptes &lt;7j</div></div><div class="stat-card"><div class="stat-label">Musique</div><div class="stat-value c-purple">ON</div><div class="stat-sub">/play actif</div></div></div>
+      </div>
+    </div>
+
+    <!-- SÉCURITÉ -->
+    <div class="page" id="page-securite">
+
+      <!-- Score global -->
+      <div class="section-label">Score de sécurité</div>
+      <div class="sec-card" style="margin-bottom:20px">
+        <div class="score-wrap">
+          <div class="score-circle"><div class="score-inner" id="secScore">72</div></div>
+          <div class="score-details">
+            <div class="score-title">Protection globale — Bonne</div>
+            <div class="score-sub">Quelques améliorations recommandées</div>
+            <div class="score-bar-row"><div class="score-bar-label">Anti-intrusion</div><div class="score-bar"><div class="score-bar-fill" style="width:90%;background:var(--green)"></div></div></div>
+            <div class="score-bar-row"><div class="score-bar-label">Anti-spam</div><div class="score-bar"><div class="score-bar-fill" style="width:85%;background:var(--green)"></div></div></div>
+            <div class="score-bar-row"><div class="score-bar-label">AutoMod</div><div class="score-bar"><div class="score-bar-fill" style="width:60%;background:var(--amber)"></div></div></div>
+            <div class="score-bar-row"><div class="score-bar-label">Mots interdits</div><div class="score-bar"><div class="score-bar-fill" style="width:40%;background:var(--amber)" id="bannedWordsBar"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Protections actives -->
+      <div class="section-label">Protections actives</div>
+      <div class="prot-grid" id="protGrid">
+        <div class="prot-card active"><div class="prot-icon">🚨</div><div class="prot-name">Anti-raid</div><div class="prot-status on">ACTIF</div></div>
+        <div class="prot-card active"><div class="prot-icon">⚠️</div><div class="prot-name">Anti-spam</div><div class="prot-status on">ACTIF</div></div>
+        <div class="prot-card active"><div class="prot-icon">🤖</div><div class="prot-name">Whitelist bots</div><div class="prot-status on">ACTIF</div></div>
+        <div class="prot-card active"><div class="prot-icon">🔐</div><div class="prot-name">Rôles sécurisés</div><div class="prot-status warn">CONFIG</div></div>
+        <div class="prot-card warning"><div class="prot-icon">🔗</div><div class="prot-name">Anti-liens</div><div class="prot-status warn">INACTIF</div></div>
+        <div class="prot-card warning"><div class="prot-icon">🔠</div><div class="prot-name">Anti-caps</div><div class="prot-status warn">INACTIF</div></div>
+        <div class="prot-card active"><div class="prot-icon">📢</div><div class="prot-name">Anti-mentions</div><div class="prot-status on">ACTIF</div></div>
+        <div class="prot-card active"><div class="prot-icon">🛡️</div><div class="prot-name">Auto-ban raids</div><div class="prot-status on">ACTIF</div></div>
+      </div>
+
+      <div class="sec-grid">
+        <!-- Configuration AutoMod -->
+        <div class="sec-card">
+          <div class="sec-card-head">
+            <div class="sec-card-title">🤖 Configuration AutoMod</div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--mono)">Via /automod sur Discord</span>
+          </div>
+          <div class="sec-card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">Anti-liens<span>Bloque les URLs non autorisées</span></div>
+              <label class="toggle"><input type="checkbox" id="tog-links" onchange="updateAutomod('links',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">Anti-majuscules<span>Bloque les messages >70% caps</span></div>
+              <label class="toggle"><input type="checkbox" id="tog-caps" onchange="updateAutomod('caps',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">Anti-mentions massives<span>Bloque les mentions >5 personnes</span></div>
+              <label class="toggle"><input type="checkbox" id="tog-mentions" checked onchange="updateAutomod('mentions',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">Anti-raid<span>Ban auto si 10+ joins en 10s</span></div>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">Anti-spam<span>Timeout 5min si 7+ msgs en 5s</span></div>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row" style="border-bottom:none">
+              <div class="toggle-label">Whitelist bots<span>Ban auto si bot non whitelisté</span></div>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sanctions automatiques -->
+        <div class="sec-card">
+          <div class="sec-card-head">
+            <div class="sec-card-title">⚖️ Sanctions automatiques</div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--mono)">Via /sanctions sur Discord</span>
+          </div>
+          <div class="sec-card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">3 warns → Mute 10min<span>Sanction légère</span></div>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--amber)">ACTIF</span>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">5 warns → Kick<span>Expulsion du serveur</span></div>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--amber)">ACTIF</span>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">7 warns → Ban<span>Bannissement définitif</span></div>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--red)">ACTIF</span>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">Comptes &lt;7 jours<span>Ban auto lors de raids</span></div>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--red)">ACTIF</span>
+            </div>
+            <div class="toggle-row" style="border-bottom:none">
+              <div class="toggle-label">Staff temporaire<span>Accès expire automatiquement</span></div>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--green)">DISPO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mots interdits -->
+      <div class="sec-card" style="margin-bottom:20px">
+        <div class="sec-card-head">
+          <div class="sec-card-title">🚫 Mots interdits</div>
+          <span style="font-size:11px;color:var(--text2)" id="wordCount">0 mots</span>
+        </div>
+        <div class="word-list" id="wordList"><div style="font-size:12px;color:var(--text2);padding:4px">Aucun mot interdit. Ajoutez-en ci-dessous.</div></div>
+        <div class="word-input-row">
+          <input type="text" class="word-input" id="wordInput" placeholder="Tapez un mot interdit..." onkeydown="if(event.key==='Enter') addBannedWord()">
+          <button class="btn-add-word" onclick="addBannedWord()">+ Ajouter</button>
+        </div>
+      </div>
+
+      <div class="sec-grid">
+        <!-- Alertes de sécurité -->
+        <div class="sec-card">
+          <div class="sec-card-head">
+            <div class="sec-card-title">🔔 Alertes récentes</div>
+            <button class="refresh-btn" onclick="loadSecurityAlerts()">↻</button>
+          </div>
+          <div id="alertsList">
+            <div class="alert-item"><div class="alert-icon">✅</div><div class="alert-content"><div class="alert-title">Système démarré</div><div class="alert-desc">Bot nathanfr3 en ligne</div><div class="alert-time" id="alertStartTime"></div></div></div>
+            <div class="alert-item"><div class="alert-icon">🛡️</div><div class="alert-content"><div class="alert-title">Anti-raid actif</div><div class="alert-desc">Seuil : 10 joins / 10 secondes</div><div class="alert-time">Configuré</div></div></div>
+            <div class="alert-item"><div class="alert-icon">⚠️</div><div class="alert-content"><div class="alert-title">Anti-spam actif</div><div class="alert-desc">Timeout 5min après 7 messages / 5s</div><div class="alert-time">Configuré</div></div></div>
+          </div>
+        </div>
+
+        <!-- Journal d'audit -->
+        <div class="sec-card">
+          <div class="sec-card-head">
+            <div class="sec-card-title">📋 Journal d'audit</div>
+            <button class="refresh-btn" onclick="loadAuditLog()">↻</button>
+          </div>
+          <div id="auditLog">
+            <div class="audit-item"><div class="audit-user">Système</div><div class="audit-action">Bot démarré et slash commands enregistrées</div><div class="audit-time" id="auditStartTime"></div></div>
+            <div class="audit-item"><div class="audit-user">Système</div><div class="audit-action">Connexion au backend établie</div><div class="audit-time">—</div></div>
+            <div class="audit-item"><div class="audit-user">Config</div><div class="audit-action">Anti-raid configuré (seuil 10/10s)</div><div class="audit-time">Au démarrage</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menaces détectées via backend -->
+      <div class="sec-card" style="margin-bottom:20px">
+        <div class="sec-card-head">
+          <div class="sec-card-title">⚡ Menaces détectées en temps réel</div>
+          <button class="refresh-btn" onclick="loadThreats()">↻</button>
+        </div>
+        <div id="threatsList">
+          <div class="threat-item">
+            <span class="threat-badge low">INFO</span>
+            <div class="threat-content">
+              <div class="threat-title">Aucune menace détectée</div>
+              <div class="threat-detail">Le système surveille votre serveur en temps réel</div>
+              <div class="threat-time" id="threatTime"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommandations -->
+      <div class="section-label">Recommandations</div>
+      <div class="sec-grid">
+        <div class="sec-card">
+          <div class="sec-card-head"><div class="sec-card-title">💡 Actions recommandées</div></div>
+          <div class="sec-card-body">
+            <div class="toggle-row"><div class="toggle-label" style="color:var(--amber)">Activer anti-liens<span style="color:var(--text2)">Utilisez /automod links sur Discord</span></div><span style="font-size:18px">⚠️</span></div>
+            <div class="toggle-row"><div class="toggle-label" style="color:var(--amber)">Activer anti-caps<span style="color:var(--text2)">Utilisez /automod caps sur Discord</span></div><span style="font-size:18px">⚠️</span></div>
+            <div class="toggle-row"><div class="toggle-label">Configurer salon de logs<span style="color:var(--text2)">Utilisez /setlog #salon sur Discord</span></div><span style="font-size:18px">✅</span></div>
+            <div class="toggle-row"><div class="toggle-label">Ajouter mots interdits<span style="color:var(--text2)">Via le panneau ci-dessus</span></div><span style="font-size:18px" id="recWords">⚠️</span></div>
+            <div class="toggle-row" style="border-bottom:none"><div class="toggle-label">Configurer rôles sécurisés<span style="color:var(--text2)">Utilisez /securesetup sur Discord</span></div><span style="font-size:18px">💡</span></div>
+          </div>
+        </div>
+        <div class="sec-card">
+          <div class="sec-card-head"><div class="sec-card-title">📊 Statistiques de protection</div></div>
+          <div class="sec-card-body">
+            <div class="toggle-row"><div class="toggle-label">Raids bloqués<span>Depuis le démarrage</span></div><span style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--green)" id="statRaids">0</span></div>
+            <div class="toggle-row"><div class="toggle-label">Spams bloqués<span>Depuis le démarrage</span></div><span style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--amber)" id="statSpams">0</span></div>
+            <div class="toggle-row"><div class="toggle-label">Bots bannis<span>Non whitelistés</span></div><span style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--red)" id="statBots">0</span></div>
+            <div class="toggle-row"><div class="toggle-label">Messages supprimés<span>Par l'AutoMod</span></div><span style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--accent)" id="statAutomod">0</span></div>
+            <div class="toggle-row" style="border-bottom:none"><div class="toggle-label">Warns actifs<span>Sur tous les serveurs</span></div><span style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--amber)" id="statWarns">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BIENTÔT -->
+    <div class="page" id="page-ia"><div style="text-align:center;padding:60px 20px;color:var(--text2)"><div style="font-size:48px;margin-bottom:16px">🤖</div><div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">Assistant IA — Bientôt</div></div></div>
+    <div class="page" id="page-notes"><div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">📝</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">Notes — Bientôt</div></div></div>
+    <div class="page" id="page-fichiers"><div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">📁</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">Fichiers — Bientôt</div></div></div>
+    <div class="page" id="page-taches"><div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">✅</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">Tâches — Bientôt</div></div></div>
+    <div class="page" id="page-passwords"><div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">🔐</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">Passwords — Bientôt</div></div></div>
+    <div class="page" id="page-calc"><div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">🧮</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">Calculatrice — Bientôt</div></div></div>
+
+    <div class="statusbar">
+      <div class="status-dot"></div>
+      <span>Nathan-dash v1.0</span><span>|</span>
+      <span id="clock"></span><span>|</span>
+      <span id="statusBarBot">Bot: vérification...</span><span>|</span>
+      <span id="statusBarGuilds">Serveurs: —</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:3001/api';
+let selectedGuildId=null, allGuilds=[], bannedWords=JSON.parse(localStorage.getItem('bannedWords')||'[]');
+
+// AUTH
+function login(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='nathan'&&p==='nathan123'){document.getElementById('loginPage').style.display='none';document.getElementById('app').classList.add('active');checkBackend();initSecurity();}else document.getElementById('errorMsg').classList.add('show');}
+function logout(){document.getElementById('app').classList.remove('active');document.getElementById('loginPage').style.display='flex';document.getElementById('username').value='';document.getElementById('password').value='';}
+
+// NAV
+const pageTitles={dashboard:'Dashboard',traducteur:'Traducteur',ia:'Assistant IA',notes:'Notes',fichiers:'Fichiers',taches:'Tâches',passwords:'Mots de passe',calc:'Calculatrice',discord:'Bot Discord',securite:'🛡️ Sécurité'};
+function goTo(id,navEl){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.getElementById('pageTitle').textContent=pageTitles[id]||id;if(navEl)navEl.classList.add('active');if(id==='discord')loadGuilds();if(id==='securite')loadThreats();}
+
+// THEME
+function toggleTheme(){const html=document.documentElement,isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.querySelectorAll('.theme-btn').forEach(b=>b.textContent=isDark?'🌙':'☀️');}
+
+// CLOCK
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR');}
+setInterval(updateClock,1000);updateClock();
+const now=new Date().toLocaleTimeString('fr-FR');
+document.getElementById('alertStartTime').textContent=now;
+document.getElementById('auditStartTime').textContent=now;
+document.getElementById('threatTime').textContent='Dernière vérif : '+now;
+
+// BACKEND
+async function checkBackend(){try{const res=await fetch(`${API}/status`);const data=await res.json();if(data.online){document.getElementById('backendStatus').textContent='● Backend ON';document.getElementById('backendStatus').style.color='var(--green)';document.getElementById('botTagDisplay').textContent=data.username;document.getElementById('botPingDisplay').textContent=`Ping: ${data.ping}ms`;document.getElementById('statusBarBot').textContent=`Bot: ${data.username}`;document.getElementById('statusBarGuilds').textContent=`Serveurs: ${data.guilds}`;document.getElementById('backendAlert').style.display='none';}}catch(e){document.getElementById('backendStatus').textContent='● Backend OFF';document.getElementById('backendStatus').style.color='var(--amber)';document.getElementById('statusBarBot').textContent='Bot: hors ligne';document.getElementById('backendAlert').style.display='block';}}
+setInterval(checkBackend,15000);
+
+// DISCORD
+async function loadGuilds(){try{const res=await fetch(`${API}/guilds`);allGuilds=await res.json();const grid=document.getElementById('guildsGrid');if(!allGuilds.length){grid.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px">Aucun serveur.</div>';return;}grid.innerHTML=allGuilds.map(g=>`<div class="guild-card ${selectedGuildId===g.id?'active-guild':''}" onclick="selectGuild('${g.id}','${g.name.replace(/'/g,"\\'")}')"><div class="guild-icon-placeholder">${g.name.charAt(0).toUpperCase()}</div><div class="guild-info"><div class="guild-name">${g.name}</div><div class="guild-members">${g.memberCount} membres</div></div></div>`).join('');}catch(e){document.getElementById('guildsGrid').innerHTML='<div style="font-size:12px;color:var(--amber);padding:8px">Backend non disponible.</div>';}}
+function selectGuild(id,name){selectedGuildId=id;document.getElementById('selectedGuildName').textContent=name;document.getElementById('guildDetail').style.display='block';loadGuilds();loadSelectedGuild();loadSelectedLogs();loadSelectedMembers();}
+async function loadSelectedGuild(){if(!selectedGuildId)return;try{const res=await fetch(`${API}/stats/${selectedGuildId}`);const data=await res.json();if(data.error)return;document.getElementById('guildStatMembers').textContent=data.memberCount;document.getElementById('guildStatOnline').textContent=data.online||'—';document.getElementById('guildStatChannels').textContent=data.channelCount;document.getElementById('guildStatRoles').textContent=data.roleCount;}catch(e){}}
+async function loadSelectedLogs(){if(!selectedGuildId)return;try{const res=await fetch(`${API}/logs/${selectedGuildId}`);const logs=await res.json();const list=document.getElementById('selectedLogList');if(!logs.length){list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Aucun log.</div>';return;}list.innerHTML=logs.map(l=>`<div class="log-item ${l.type}"><span style="font-size:14px;flex-shrink:0">${l.icon}</span><div class="log-content"><div class="log-title">${l.title}</div><div class="log-time">${l.detail} • ${l.time}</div></div></div>`).join('');}catch(e){}}
+async function loadSelectedMembers(){if(!selectedGuildId)return;try{const res=await fetch(`${API}/members/${selectedGuildId}`);const members=await res.json();const list=document.getElementById('selectedMemberList');if(!members.length){list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Aucun membre.</div>';return;}list.innerHTML=members.map(m=>`<div class="member-item">${m.avatar?`<img src="${m.avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">`:`<div class="member-avatar-ph">${m.displayName.charAt(0).toUpperCase()}</div>`}<div><div style="font-weight:600;font-size:12px">${m.displayName}</div><div style="font-size:10px;color:var(--text2)">${m.roles.join(', ')||'Membre'}</div></div><div class="member-dot" style="background:${m.status==='online'?'var(--green)':m.status==='idle'?'var(--amber)':m.status==='dnd'?'var(--red)':'var(--text2)'}"></div></div>`).join('');}catch(e){}}
+setInterval(()=>{if(document.getElementById('page-discord').classList.contains('active')&&selectedGuildId)loadSelectedLogs();},5000);
+
+// ══════════════════════════════════════
+//  SÉCURITÉ
+// ══════════════════════════════════════
+function initSecurity(){renderBannedWords();document.getElementById('threatTime').textContent='Dernière vérif : '+new Date().toLocaleTimeString('fr-FR');}
+
+// Mots interdits
+function renderBannedWords(){const list=document.getElementById('wordList');document.getElementById('wordCount').textContent=`${bannedWords.length} mot${bannedWords.length>1?'s':''}`;if(!bannedWords.length){list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:4px">Aucun mot interdit.</div>';document.getElementById('recWords').textContent='⚠️';document.getElementById('bannedWordsBar').style.width='10%';return;}list.innerHTML=bannedWords.map((w,i)=>`<div class="word-tag">${w}<button onclick="removeBannedWord(${i})">✕</button></div>`).join('');document.getElementById('recWords').textContent='✅';const pct=Math.min(100,10+bannedWords.length*15);document.getElementById('bannedWordsBar').style.width=pct+'%';document.getElementById('bannedWordsBar').style.background=bannedWords.length>3?'var(--green)':'var(--amber)';}
+function addBannedWord(){const input=document.getElementById('wordInput');const word=input.value.trim().toLowerCase();if(!word)return;if(bannedWords.includes(word)){input.value='';return;}bannedWords.push(word);localStorage.setItem('bannedWords',JSON.stringify(bannedWords));input.value='';renderBannedWords();addAuditEntry('AutoMod',`Mot interdit ajouté : "${word}"`);}
+function removeBannedWord(i){bannedWords.splice(i,1);localStorage.setItem('bannedWords',JSON.stringify(bannedWords));renderBannedWords();}
+
+// Toggles AutoMod (informatif — les vraies configs se font via Discord)
+function updateAutomod(type,val){addAuditEntry('AutoMod',`${type} ${val?'activé':'désactivé'} — Utilisez /automod ${type} sur Discord pour appliquer`);}
+
+// Alertes
+function loadSecurityAlerts(){document.getElementById('alertStartTime').textContent=new Date().toLocaleTimeString('fr-FR');}
+
+// Audit
+function addAuditEntry(user,action){const log=document.getElementById('auditLog');const time=new Date().toLocaleTimeString('fr-FR');const item=document.createElement('div');item.className='audit-item';item.innerHTML=`<div class="audit-user">${user}</div><div class="audit-action">${action}</div><div class="audit-time">${time}</div>`;log.insertBefore(item,log.firstChild);if(log.children.length>20)log.removeChild(log.lastChild);}
+
+// Menaces via backend
+async function loadThreats(){try{const logs=await(await fetch(`${API}/logs/${selectedGuildId||''}`)).json();const threats=document.getElementById('threatsList');const filtered=logs.filter(l=>['raid','ban','spam'].includes(l.type)).slice(0,5);if(!filtered.length){threats.innerHTML=`<div class="threat-item"><span class="threat-badge low">INFO</span><div class="threat-content"><div class="threat-title">Aucune menace détectée</div><div class="threat-detail">Système opérationnel</div><div class="threat-time">${new Date().toLocaleTimeString('fr-FR')}</div></div></div>`;return;}const levels={raid:'critical',ban:'high',spam:'medium'};const labels={raid:'RAID',ban:'BAN',spam:'SPAM'};threats.innerHTML=filtered.map(l=>`<div class="threat-item"><span class="threat-badge ${levels[l.type]||'low'}">${labels[l.type]||'INFO'}</span><div class="threat-content"><div class="threat-title">${l.title}</div><div class="threat-detail">${l.detail}</div><div class="threat-time">${l.time}</div></div></div>`).join('');}catch(e){}}
+function loadAuditLog(){addAuditEntry('Système','Journal actualisé');}
+setInterval(()=>{if(document.getElementById('page-securite').classList.contains('active'))loadThreats();},10000);
+
+// TRADUCTEUR
+const tradHistory=[];
+async function doTranslate(){const text=document.getElementById('sourceText').value.trim();if(!text)return;const source=document.getElementById('sourceLang').value,target=document.getElementById('targetLang').value;if(source===target){document.getElementById('resultText').value=text;return;}const btn=document.getElementById('translateBtn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Traduction...';document.getElementById('errorBox').classList.remove('show');let translation=null;try{const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`);const data=await res.json();if(data.responseStatus===200)translation=data.responseData.translatedText;}catch(e){}if(!translation){try{const res=await fetch(`https://lingva.ml/api/v1/${source}/${target}/${encodeURIComponent(text)}`);const data=await res.json();if(data.translation)translation=data.translation;}catch(e){}}if(translation){document.getElementById('resultText').value=translation;document.getElementById('resultCount').textContent=translation.length+' caractères';tradHistory.unshift({text,translation,source,target});if(tradHistory.length>5)tradHistory.pop();renderTradHistory();}else document.getElementById('errorBox').classList.add('show');btn.disabled=false;btn.innerHTML='🌐 Traduire';}
+function renderTradHistory(){const el=document.getElementById('tradHistory');if(!tradHistory.length){el.innerHTML='<div style="font-size:12px;color:var(--text2)">Aucune traduction.</div>';return;}el.innerHTML=tradHistory.map((h,i)=>`<div class="history-item" onclick="loadHist(${i})"><div class="hist-langs">${h.source.toUpperCase()} → ${h.target.toUpperCase()}</div><div class="hist-text">${h.text.substring(0,60)}${h.text.length>60?'...':''}</div><div class="hist-trad">${h.translation.substring(0,60)}${h.translation.length>60?'...':''}</div></div>`).join('');}
+function loadHist(i){const h=tradHistory[i];document.getElementById('sourceText').value=h.text;document.getElementById('resultText').value=h.translation;document.getElementById('sourceLang').value=h.source;document.getElementById('targetLang').value=h.target;updateCharCount();}
+function swapLangs(){const sl=document.getElementById('sourceLang'),tl=document.getElementById('targetLang'),st=document.getElementById('sourceText'),rt=document.getElementById('resultText');[sl.value,tl.value]=[tl.value,sl.value];[st.value,rt.value]=[rt.value,st.value];updateCharCount();}
+function updateCharCount(){const l=document.getElementById('sourceText').value.length;const el=document.getElementById('charCount');el.textContent=l;el.style.color=l>450?'var(--red)':'var(--text2)';}
+function clearTrad(){document.getElementById('sourceText').value='';document.getElementById('resultText').value='';document.getElementById('charCount').textContent='0';document.getElementById('resultCount').textContent='—';document.getElementById('errorBox').classList.remove('show');}
+function copyTrad(id){const t=document.getElementById(id).value;if(!t)return;navigator.clipboard.writeText(t).then(()=>{const b=event.target;const o=b.textContent;b.textContent='✅';setTimeout(()=>b.textContent=o,1500);});}
+function quickPhrase(t){document.getElementById('sourceText').value=t;updateCharCount();doTranslate();}
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter'&&document.getElementById('page-traducteur').classList.contains('active'))doTranslate();});
+</script>
+</body>
+</html>
