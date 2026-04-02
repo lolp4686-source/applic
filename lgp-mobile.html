@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Los Galactique Protect</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0f; --bg2:#12121a; --bg3:#1a1a26;
+  --border:rgba(255,255,255,0.08); --text:#e8e8f0; --text2:#8888aa;
+  --accent:#7c6fff; --accent2:#ff6f91; --green:#4fffb0;
+  --red:#ff4f6f; --amber:#ffb84f; --discord:#5865F2;
+  --radius:14px; --font:'Space Grotesk',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --nav-h:64px; --topbar-h:56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+[data-theme="light"] {
+  --bg:#f0f0f8; --bg2:#ffffff; --bg3:#e8e8f5;
+  --border:rgba(0,0,0,0.08); --text:#1a1a2e; --text2:#6666aa;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); }
+
+/* ── AUTH ── */
+.auth-page {
+  position:fixed; inset:0; display:flex; align-items:center;
+  justify-content:center; z-index:1000; background:var(--bg);
+  overflow-y:auto; padding:20px;
+}
+.auth-page::before {
+  content:''; position:fixed; inset:0;
+  background-image:linear-gradient(rgba(124,111,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,111,255,0.03) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+.orb { position:fixed; border-radius:50%; filter:blur(60px); pointer-events:none; animation:orbFloat 8s ease-in-out infinite; }
+.orb1 { width:280px; height:280px; background:rgba(124,111,255,0.12); top:-80px; right:-60px; }
+.orb2 { width:200px; height:200px; background:rgba(255,111,145,0.08); bottom:-30px; left:-40px; animation-delay:-4s; }
+@keyframes orbFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+.auth-wrap { position:relative; z-index:10; width:100%; max-width:380px; animation:fadeUp 0.5s ease forwards; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+.logo { display:flex; align-items:center; gap:10px; margin-bottom:6px; justify-content:center; }
+.logo-icon { width:44px; height:44px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; color:white; box-shadow:0 0 24px rgba(124,111,255,0.4); }
+.logo-text { font-size:18px; font-weight:700; letter-spacing:-0.5px; }
+.logo-text span { color:var(--accent); }
+.logo-sub { font-size:11px; color:var(--text2); text-align:center; margin-bottom:20px; }
+
+.auth-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:0 16px 48px rgba(0,0,0,0.3); }
+.auth-tabs { display:flex; gap:0; margin-bottom:20px; background:var(--bg3); border-radius:10px; padding:4px; }
+.auth-tab { flex:1; padding:9px; text-align:center; font-size:13px; font-weight:500; cursor:pointer; border-radius:7px; transition:all 0.2s; color:var(--text2); }
+.auth-tab.active { background:var(--bg2); color:var(--text); box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+
+.field { margin-bottom:12px; }
+.field label { display:block; font-size:11px; font-weight:500; color:var(--text2); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+.field input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-family:var(--font); font-size:15px; color:var(--text); outline:none; transition:border-color 0.2s; }
+.field input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,111,255,0.12); }
+.field input::placeholder { color:var(--text2); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.pwd-strength { margin-top:5px; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.pwd-strength-bar { height:100%; border-radius:2px; transition:width 0.3s,background 0.3s; width:0; }
+.pwd-hint { font-size:10px; color:var(--text2); margin-top:3px; }
+.btn-auth { width:100%; padding:14px; background:linear-gradient(135deg,var(--accent),#9b8fff); border:none; border-radius:10px; color:white; font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; box-shadow:0 4px 16px rgba(124,111,255,0.4); transition:opacity 0.2s; }
+.btn-auth:active { opacity:0.85; }
+.alert { border-radius:8px; padding:9px 12px; font-size:12px; margin-bottom:12px; display:none; font-family:var(--mono); }
+.alert.show { display:block; }
+.alert-error { background:rgba(255,79,111,0.1); border:1px solid rgba(255,79,111,0.3); color:var(--red); }
+.alert-success { background:rgba(79,255,176,0.1); border:1px solid rgba(79,255,176,0.3); color:var(--green); }
+.avatar-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.avatar-opt { width:36px; height:36px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:border-color 0.2s; font-size:18px; display:flex; align-items:center; justify-content:center; background:var(--bg3); }
+.avatar-opt.selected { border-color:var(--accent); }
+
+/* ── APP SHELL ── */
+.app { display:none; position:fixed; inset:0; flex-direction:column; }
+.app.active { display:flex; animation:fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* Topbar */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; height:var(--topbar-h); background:var(--bg2);
+  border-bottom:1px solid var(--border); flex-shrink:0;
+  position:relative; z-index:10;
+}
+.topbar-left { display:flex; align-items:center; gap:10px; }
+.topbar-logo { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.topbar h1 { font-size:15px; font-weight:700; }
+.topbar-right { display:flex; align-items:center; gap:8px; }
+.badge-online { padding:3px 8px; border-radius:20px; font-size:10px; font-weight:600; font-family:var(--mono); background:rgba(79,255,176,0.1); color:var(--green); border:1px solid rgba(79,255,176,0.2); }
+.theme-btn { background:var(--bg3); border:1px solid var(--border); border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; flex-shrink:0; }
+
+/* Scroll area */
+.content-area {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 8px);
+}
+
+/* Pages */
+.page { display:none; padding:16px; }
+.page.active { display:block; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0;
+  height:calc(var(--nav-h) + var(--safe-bottom));
+  background:var(--bg2); border-top:1px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-around;
+  padding-top:6px; z-index:100;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+.nav-btn {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:6px 12px; border-radius:12px; cursor:pointer;
+  transition:all 0.15s; flex:1; max-width:72px;
+  border:none; background:none; color:var(--text2);
+}
+.nav-btn.active { color:var(--accent); }
+.nav-btn .nav-icon { font-size:20px; line-height:1; }
+.nav-btn .nav-label { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; line-height:1; }
+
+/* ── SECTION LABEL ── */
+.section-label { font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+
+/* ── DASHBOARD ── */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+.stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; cursor:pointer; transition:border-color 0.2s; active:border-color var(--accent); }
+.stat-card:active { border-color:var(--accent); transform:scale(0.98); }
+.stat-label { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.stat-value { font-size:24px; font-weight:700; font-family:var(--mono); }
+.stat-sub { font-size:10px; color:var(--text2); margin-top:3px; }
+.c-purple{color:var(--accent);} .c-green{color:var(--green);} .c-red{color:var(--red);} .c-amber{color:var(--amber);}
+
+.modules-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.module-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:14px 8px; text-align:center; cursor:pointer; transition:all 0.15s; }
+.module-card:active:not(.disabled) { border-color:var(--accent); transform:scale(0.96); }
+.module-card.disabled { opacity:0.4; cursor:not-allowed; }
+.m-icon { font-size:22px; margin-bottom:6px; }
+.m-name { font-size:11px; font-weight:600; }
+.m-desc { font-size:9px; color:var(--text2); margin-top:2px; }
+.m-badge { font-size:8px; background:rgba(255,184,79,0.15); color:var(--amber); border-radius:4px; padding:1px 5px; margin-top:4px; display:inline-block; }
+
+/* ── CALCULATRICE (mobile) ── */
+.calc-mobile { display:flex; flex-direction:column; gap:14px; }
+
+.ti83-mobile {
+  background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%);
+  border-radius:16px 16px 28px 28px;
+  padding:12px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  border:2px solid #0f3460;
+}
+.ti-brand { text-align:center; margin-bottom:6px; font-size:10px; font-weight:700; color:#4a9eff; letter-spacing:2px; font-family:'Share Tech Mono',monospace; }
+.calc-screen-wrap { background:#000; border-radius:6px; padding:6px; margin-bottom:10px; border:2px solid #0f3460; box-shadow:inset 0 2px 6px rgba(0,0,0,0.8); }
+.calc-screen-header { display:flex; justify-content:space-between; font-size:8px; color:#4a9eff; font-family:'Share Tech Mono',monospace; margin-bottom:3px; padding:0 2px; }
+.calc-screen { background:#9db4a0; border-radius:3px; padding:6px 8px; min-height:60px; font-family:'Share Tech Mono',monospace; }
+.calc-expr { font-size:10px; color:#2d4a3e; min-height:14px; word-break:break-all; margin-bottom:2px; }
+.calc-result { font-size:20px; color:#1a2e26; text-align:right; font-weight:bold; word-break:break-all; }
+.calc-mode { font-size:8px; color:#2d4a3e; margin-top:3px; display:flex; gap:6px; }
+.calc-mode span { opacity:0.6; }
+.calc-mode span.active { opacity:1; font-weight:bold; }
+
+.calc-keys { display:flex; flex-direction:column; gap:4px; }
+.key-row { display:flex; gap:3px; justify-content:center; }
+.key {
+  border:none; border-radius:5px; cursor:pointer;
+  font-family:'Share Tech Mono',monospace; font-size:10px; font-weight:700;
+  transition:all 0.1s; position:relative;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  user-select:none; -webkit-user-select:none;
+  touch-action:manipulation;
+}
+.key:active { transform:scale(0.9); filter:brightness(0.75); }
+.key-blue { background:linear-gradient(180deg,#2a5caa,#1e4080); color:#fff; flex:1; height:28px; box-shadow:0 2px 0 #0d2b5e; }
+.key-gray { background:linear-gradient(180deg,#6b7280,#4b5563); color:#fff; flex:1; height:28px; box-shadow:0 2px 0 #374151; }
+.key-dark { background:linear-gradient(180deg,#1f2937,#111827); color:#e5e7eb; flex:1; height:28px; box-shadow:0 2px 0 #030712; }
+.key-clear { background:linear-gradient(180deg,#dc2626,#b91c1c); color:#fff; flex:1; height:28px; box-shadow:0 2px 0 #7f1d1d; }
+.key-enter { background:linear-gradient(180deg,#7c3aed,#5b21b6); color:#fff; flex:2; height:32px; font-size:12px; box-shadow:0 2px 0 #3b0764; }
+.key-2nd { background:linear-gradient(180deg,#d97706,#b45309); color:#fff; flex:1; height:28px; box-shadow:0 2px 0 #78350f; }
+.key-alpha { background:linear-gradient(180deg,#16a34a,#15803d); color:#fff; flex:1; height:28px; box-shadow:0 2px 0 #14532d; }
+.key-top { font-size:6px; color:#fbbf24; position:absolute; top:1px; left:50%; transform:translateX(-50%); white-space:nowrap; }
+.key-zero { flex:2; }
+.dpad-row { display:flex; justify-content:center; gap:3px; margin:2px 0; }
+.dpad-btn { background:linear-gradient(180deg,#374151,#1f2937); color:#9ca3af; border:none; border-radius:4px; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; width:32px; height:26px; transition:all 0.1s; touch-action:manipulation; }
+.dpad-btn:active { transform:scale(0.9); }
+.dpad-center { background:linear-gradient(180deg,#4b5563,#374151); border-radius:50% !important; font-size:8px; color:#d1d5db; width:28px; height:28px; }
+
+.calc-tabs { display:flex; gap:0; background:var(--bg3); border-radius:10px; padding:3px; margin-bottom:12px; }
+.calc-tab { flex:1; padding:8px; text-align:center; font-size:11px; font-weight:600; cursor:pointer; border-radius:8px; transition:all 0.2s; color:var(--text2); }
+.calc-tab.active { background:var(--bg2); color:var(--text); box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+
+.calc-panel-body { padding:12px; }
+.history-calc { display:flex; flex-direction:column; gap:5px; max-height:160px; overflow-y:auto; }
+.history-entry { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:var(--bg3); border-radius:8px; font-size:11px; cursor:pointer; }
+.history-entry:active { background:rgba(124,111,255,0.1); }
+.history-expr { color:var(--text2); font-family:var(--mono); }
+.history-res { color:var(--accent); font-family:var(--mono); font-weight:600; }
+
+canvas#graphCanvas { background:#9db4a0; border-radius:6px; display:block; width:100%; }
+.graph-controls { display:flex; gap:8px; margin-top:8px; }
+.graph-input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-family:var(--mono); font-size:12px; color:var(--text); outline:none; }
+.graph-input:focus { border-color:var(--accent); }
+.btn-graph { padding:8px 12px; background:linear-gradient(135deg,var(--accent),#9b8fff); border:none; border-radius:8px; color:white; font-family:var(--font); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.btn-graph-clear { padding:8px 10px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; color:var(--text2); font-family:var(--font); font-size:12px; cursor:pointer; }
+.conv-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.conv-item { background:var(--bg3); border-radius:8px; padding:10px; font-size:11px; }
+.conv-label { color:var(--text2); margin-bottom:3px; }
+.conv-value { font-family:var(--mono); color:var(--accent); font-weight:600; }
+.select-full { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:9px 12px; font-family:var(--font); font-size:13px; color:var(--text); outline:none; margin-bottom:8px; }
+
+/* ── TRADUCTEUR ── */
+.lang-bar { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.lang-select { flex:1; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-family:var(--font); font-size:13px; color:var(--text); outline:none; }
+.swap-btn { background:var(--bg2); border:1px solid var(--border); border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; flex-shrink:0; transition:transform 0.3s; }
+.swap-btn:active { transform:rotate(180deg); }
+.trad-grid { display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:12px; }
+.text-panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.panel-head { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; border-bottom:1px solid var(--border); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text2); }
+.icon-btn { background:none; border:none; cursor:pointer; font-size:14px; padding:2px 6px; border-radius:4px; color:var(--text2); }
+.trad-textarea { width:100%; min-height:100px; background:transparent; border:none; outline:none; padding:12px; font-family:var(--font); font-size:14px; color:var(--text); resize:none; line-height:1.6; }
+.trad-textarea::placeholder { color:var(--text2); }
+.char-count { padding:5px 12px; font-size:10px; color:var(--text2); font-family:var(--mono); border-top:1px solid var(--border); text-align:right; }
+.btn-translate { width:100%; padding:13px; background:linear-gradient(135deg,var(--accent),#9b8fff); border:none; border-radius:10px; color:white; font-family:var(--font); font-size:14px; font-weight:600; cursor:pointer; margin-bottom:16px; transition:opacity 0.2s; }
+.btn-translate:active { opacity:0.85; }
+.btn-translate:disabled { opacity:0.5; cursor:not-allowed; }
+.spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:6px; vertical-align:middle; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.phrases { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.phrase-btn { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-family:var(--font); font-size:11px; color:var(--text2); cursor:pointer; transition:all 0.15s; }
+.phrase-btn:active { border-color:var(--accent); color:var(--accent); }
+.trad-history { display:flex; flex-direction:column; gap:7px; }
+.history-item { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; cursor:pointer; }
+.hist-langs { font-size:10px; color:var(--text2); font-family:var(--mono); margin-bottom:2px; }
+.hist-text { font-size:13px; color:var(--text); }
+.hist-trad { font-size:12px; color:var(--accent); margin-top:2px; }
+.error-box { background:rgba(255,79,111,0.1); border:1px solid rgba(255,79,111,0.3); border-radius:8px; padding:9px 12px; font-size:11px; color:var(--red); margin-bottom:10px; display:none; font-family:var(--mono); }
+.error-box.show { display:block; }
+
+/* ── DISCORD ── */
+.guilds-grid { display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:20px; }
+.guild-card { background:var(--bg2); border:2px solid var(--border); border-radius:var(--radius); padding:14px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:10px; }
+.guild-card:active { border-color:var(--discord); transform:scale(0.98); }
+.guild-card.active-guild { border-color:var(--discord); }
+.guild-icon-ph { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--discord),#7289da); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:white; flex-shrink:0; }
+.guild-name { font-size:13px; font-weight:600; }
+.guild-members { font-size:11px; color:var(--text2); margin-top:2px; }
+.guild-detail { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+.guild-detail-head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--border); }
+.guild-stats-row { display:grid; grid-template-columns:repeat(4,1fr); }
+.guild-stat { text-align:center; padding:12px 6px; border-right:1px solid var(--border); }
+.guild-stat:last-child { border-right:none; }
+.guild-stat-value { font-size:18px; font-weight:700; font-family:var(--mono); color:var(--accent); }
+.guild-stat-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
+.discord-panels { display:grid; grid-template-columns:1fr; gap:12px; }
+.discord-panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.discord-panel-head { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
+.refresh-btn { background:none; border:none; cursor:pointer; color:var(--text2); font-size:15px; transition:transform 0.3s; }
+.refresh-btn:active { transform:rotate(180deg); color:var(--accent); }
+.log-list { padding:10px; max-height:240px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; }
+.log-item { display:flex; align-items:flex-start; gap:8px; padding:7px 9px; border-radius:8px; background:var(--bg3); font-size:11px; }
+.log-title { font-weight:600; color:var(--text); margin-bottom:1px; }
+.log-time { font-size:9px; color:var(--text2); font-family:var(--mono); }
+.log-item.raid{border-left:3px solid var(--red);} .log-item.spam{border-left:3px solid var(--amber);}
+.log-item.join{border-left:3px solid var(--green);} .log-item.ban{border-left:3px solid var(--red);}
+.log-item.leave{border-left:3px solid var(--amber);} .log-item.info{border-left:3px solid var(--discord);}
+.member-list { padding:10px; max-height:240px; overflow-y:auto; display:flex; flex-direction:column; gap:5px; }
+.member-item { display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:8px; background:var(--bg3); font-size:11px; }
+.member-avatar-ph { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; flex-shrink:0; }
+.member-dot { margin-left:auto; width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.backend-alert { background:rgba(255,184,79,0.1); border:1px solid rgba(255,184,79,0.3); border-radius:8px; padding:9px 12px; font-size:11px; color:var(--amber); margin-bottom:14px; font-family:var(--mono); }
+
+/* ── PROFIL ── */
+.profile-header { display:flex; align-items:center; gap:14px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; }
+.profile-avatar { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; border:2px solid var(--accent); }
+.profile-info h2 { font-size:17px; font-weight:700; }
+.profile-info p { font-size:12px; color:var(--text2); margin-top:3px; }
+.profile-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; background:rgba(124,111,255,0.15); color:var(--accent); border:1px solid rgba(124,111,255,0.3); margin-top:6px; }
+.profile-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
+.profile-card h3 { font-size:13px; font-weight:600; margin-bottom:14px; }
+.profile-field { margin-bottom:12px; }
+.profile-field label { display:block; font-size:11px; color:var(--text2); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+.profile-field input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-family:var(--font); font-size:14px; color:var(--text); outline:none; transition:border-color 0.2s; }
+.profile-field input:focus { border-color:var(--accent); }
+.btn-row { display:flex; gap:10px; flex-wrap:wrap; }
+.btn-save { padding:10px 18px; background:linear-gradient(135deg,var(--accent),#9b8fff); border:none; border-radius:8px; color:white; font-family:var(--font); font-size:13px; font-weight:600; cursor:pointer; }
+.btn-danger { padding:10px 18px; background:rgba(255,79,111,0.1); border:1px solid rgba(255,79,111,0.3); border-radius:8px; color:var(--red); font-family:var(--font); font-size:13px; font-weight:600; cursor:pointer; }
+.session-item { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.session-item:last-child { border-bottom:none; }
+
+/* ── COMING SOON ── */
+.coming-soon { text-align:center; padding:50px 20px; color:var(--text2); }
+.coming-soon .big-icon { font-size:48px; margin-bottom:14px; }
+.coming-soon h2 { font-size:17px; font-weight:600; color:var(--text); margin-bottom:6px; }
+.coming-soon p { font-size:13px; }
+
+/* ── STATUS BAR ── */
+.statusbar { display:none; }
+
+/* ── MORE MENU ── */
+.more-menu {
+  display:none; position:fixed; bottom:calc(var(--nav-h) + var(--safe-bottom) + 8px); right:8px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+  padding:8px; z-index:200; min-width:200px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+  animation:slideUp 0.2s ease;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.more-menu.show { display:block; }
+.more-item { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text2); transition:background 0.1s; }
+.more-item:active { background:var(--bg3); color:var(--text); }
+.more-item.active-page { background:rgba(124,111,255,0.12); color:var(--accent); }
+.more-item .icon { font-size:16px; width:20px; text-align:center; }
+.more-backdrop { display:none; position:fixed; inset:0; z-index:190; }
+.more-backdrop.show { display:block; }
+.badge-soon-sm { font-size:8px; background:rgba(124,111,255,0.15); color:var(--accent); border-radius:3px; padding:1px 4px; margin-left:auto; }
+.badge-on-sm { font-size:8px; background:rgba(79,255,176,0.15); color:var(--green); border-radius:3px; padding:1px 4px; margin-left:auto; }
+
+.card-full { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:14px; }
+.card-head { display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-bottom:1px solid var(--border); font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
+.card-body { padding:14px; }
+
+/* Logout button in topbar */
+.logout-btn { background:rgba(255,79,111,0.1); border:1px solid rgba(255,79,111,0.2); border-radius:8px; padding:5px 10px; font-size:11px; color:var(--red); cursor:pointer; font-family:var(--font); font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div class="auth-page" id="loginPage">
+  <div class="auth-wrap">
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      <div class="logo-text">Los Galactique <span>Protect</span></div>
+    </div>
+    <div class="logo-sub">Protection &amp; Gestion de serveurs Discord</div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="showTab('login')">Connexion</div>
+        <div class="auth-tab" onclick="showTab('register')">Inscription</div>
+      </div>
+      <!-- Login -->
+      <div id="tabLogin">
+        <div class="alert alert-error" id="loginError"></div>
+        <div class="alert alert-success" id="loginSuccess"></div>
+        <div class="field"><label>Identifiant ou email</label><input type="text" id="loginUser" placeholder="votre identifiant" autocomplete="username"/></div>
+        <div class="field"><label>Mot de passe</label><input type="password" id="loginPwd" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:12px;color:var(--text2)">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="rememberMe"> Se souvenir</label>
+          <a onclick="showForgot()" style="color:var(--accent);cursor:pointer">Oublié ?</a>
+        </div>
+        <button class="btn-auth" onclick="doLogin()">Se connecter</button>
+      </div>
+      <!-- Register -->
+      <div id="tabRegister" style="display:none">
+        <div class="alert alert-error" id="registerError"></div>
+        <div class="alert alert-success" id="registerSuccess"></div>
+        <div class="field-row">
+          <div class="field"><label>Prénom</label><input type="text" id="regFirstname" placeholder="Prénom"/></div>
+          <div class="field"><label>Nom</label><input type="text" id="regLastname" placeholder="Nom"/></div>
+        </div>
+        <div class="field"><label>Identifiant</label><input type="text" id="regUsername" placeholder="ex: nathanfr3" oninput="checkUsername()"/></div>
+        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="votre@email.com"/></div>
+        <div class="field"><label>Mot de passe</label><input type="password" id="regPwd" placeholder="Min. 8 caractères" oninput="checkPasswordStrength()"/><div class="pwd-strength"><div class="pwd-strength-bar" id="pwdBar"></div></div><div class="pwd-hint" id="pwdHint">Entrez un mot de passe</div></div>
+        <div class="field"><label>Confirmer</label><input type="password" id="regPwd2" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()"/></div>
+        <div class="field"><label>Avatar</label><div class="avatar-row" id="avatarRow"><div class="avatar-opt selected" onclick="selectAvatar(this,'🛡️')">🛡️</div><div class="avatar-opt" onclick="selectAvatar(this,'⚡')">⚡</div><div class="avatar-opt" onclick="selectAvatar(this,'🔥')">🔥</div><div class="avatar-opt" onclick="selectAvatar(this,'🌟')">🌟</div><div class="avatar-opt" onclick="selectAvatar(this,'🎮')">🎮</div><div class="avatar-opt" onclick="selectAvatar(this,'🤖')">🤖</div><div class="avatar-opt" onclick="selectAvatar(this,'👑')">👑</div><div class="avatar-opt" onclick="selectAvatar(this,'🎵')">🎵</div></div></div>
+        <button class="btn-auth" onclick="doRegister()">Créer mon compte</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="app" id="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">🛡️</div>
+      <h1 id="pageTitle">Dashboard</h1>
+    </div>
+    <div class="topbar-right">
+      <span class="badge-online" id="backendStatus">●</span>
+      <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+      <button class="logout-btn" onclick="doLogout()">🚪</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" onclick="goTo('calc')"><div class="stat-label">Calculatrice</div><div class="stat-value c-purple">TI-83</div><div class="stat-sub">Premium</div></div>
+        <div class="stat-card" onclick="goTo('discord')"><div class="stat-label">Bot Discord</div><div class="stat-value c-green">ON</div><div class="stat-sub">LGP actif</div></div>
+        <div class="stat-card" onclick="goTo('traducteur')"><div class="stat-label">Traducteur</div><div class="stat-value c-purple">11</div><div class="stat-sub">langues</div></div>
+        <div class="stat-card"><div class="stat-label">Sync GitHub</div><div class="stat-value c-amber">Auto</div><div class="stat-sub">30s</div></div>
+      </div>
+      <div class="section-label">Modules</div>
+      <div class="modules-grid">
+        <div class="module-card" onclick="goTo('calc')"><div class="m-icon">🧮</div><div class="m-name">Calculatrice</div><div class="m-desc">TI-83</div></div>
+        <div class="module-card" onclick="goTo('traducteur')"><div class="m-icon">🌐</div><div class="m-name">Traducteur</div><div class="m-desc">11 langues</div></div>
+        <div class="module-card" onclick="goTo('discord')"><div class="m-icon">💬</div><div class="m-name">Bot Discord</div><div class="m-desc">Multi-servers</div></div>
+        <div class="module-card" onclick="goTo('securite')"><div class="m-icon">🛡️</div><div class="m-name">Sécurité</div><div class="m-desc">Protection</div></div>
+        <div class="module-card" onclick="goTo('profil')"><div class="m-icon">👤</div><div class="m-name">Profil</div><div class="m-desc">Mon compte</div></div>
+        <div class="module-card disabled"><div class="m-icon">🤖</div><div class="m-name">IA</div><div class="m-desc">Claude AI</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">📝</div><div class="m-name">Notes</div><div class="m-desc">Éditeur</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">📁</div><div class="m-name">Fichiers</div><div class="m-desc">Explorateur</div><div class="m-badge">bientôt</div></div>
+        <div class="module-card disabled"><div class="m-icon">🔐</div><div class="m-name">Passwords</div><div class="m-desc">Coffre</div><div class="m-badge">bientôt</div></div>
+      </div>
+    </div>
+
+    <!-- CALCULATRICE -->
+    <div class="page" id="page-calc">
+      <div class="calc-mobile">
+        <!-- TI-83 -->
+        <div class="ti83-mobile">
+          <div class="ti-brand">TI-83 PREMIUM CE</div>
+          <div class="calc-screen-wrap">
+            <div class="calc-screen-header">
+              <span id="calcMode">DEG</span>
+              <span id="calc2ndIndicator" style="display:none;color:#fbbf24">2nd</span>
+              <span id="calcAlphaIndicator" style="display:none;color:#86efac">ALPHA</span>
+              <span>LGP</span>
+            </div>
+            <div class="calc-screen">
+              <div class="calc-expr" id="calcExpr"></div>
+              <div class="calc-result" id="calcResult">0</div>
+              <div class="calc-mode">
+                <span id="modeRad">RAD</span><span class="active" id="modeDeg">DEG</span><span id="modeFloat">FLOAT</span>
+              </div>
+            </div>
+          </div>
+          <div class="calc-keys">
+            <!-- Row 1 -->
+            <div class="key-row">
+              <button class="key key-blue" onclick="calcFn('Y=')"><span class="key-top">STAT</span>Y=</button>
+              <button class="key key-blue" onclick="calcFn('WIN')"><span class="key-top">TBL</span>WIN</button>
+              <button class="key key-blue" onclick="calcFn('ZOOM')"><span class="key-top">FMT</span>ZOM</button>
+              <button class="key key-blue" onclick="calcFn('TRACE')"><span class="key-top">CALC</span>TRC</button>
+              <button class="key key-blue" onclick="openGraph()"><span class="key-top">TABLE</span>GRPH</button>
+            </div>
+            <!-- Row 2 -->
+            <div class="key-row">
+              <button class="key key-2nd" onclick="toggle2nd()" id="btn2nd">2nd</button>
+              <button class="key key-gray" onclick="toggleMode()">MODE</button>
+              <button class="key key-gray" onclick="calcDel()">DEL</button>
+              <button class="key key-alpha" onclick="toggleAlpha()" id="btnAlpha">ALPH</button>
+              <button class="key key-gray" onclick="calcKey('x')"><span class="key-top">A</span>X</button>
+            </div>
+            <!-- Row 3 -->
+            <div class="key-row">
+              <button class="key key-gray" onclick="calcFn('STAT')">STAT</button>
+              <button class="key key-gray" onclick="calcFn('MATH')">MATH</button>
+              <button class="key key-gray" onclick="calcFn('APPS')">APPS</button>
+              <button class="key key-gray" onclick="calcFn('PRGM')">PRGM</button>
+              <button class="key key-gray" onclick="calcFn('VARS')">VARS</button>
+            </div>
+            <!-- D-Pad -->
+            <div class="dpad-row">
+              <div style="width:32px"></div>
+              <button class="dpad-btn" onclick="calcNav('up')">▲</button>
+              <div style="width:32px"></div>
+            </div>
+            <div class="dpad-row">
+              <button class="dpad-btn" onclick="calcNav('left')">◄</button>
+              <button class="dpad-btn dpad-center" onclick="calcKey(')')">)</button>
+              <button class="dpad-btn" onclick="calcNav('right')">►</button>
+              <div style="flex:1"></div>
+              <button class="key key-clear" style="flex:none;width:52px" onclick="calcClear()">CLEAR</button>
+            </div>
+            <div class="dpad-row">
+              <div style="width:32px"></div>
+              <button class="dpad-btn" onclick="calcNav('down')">▼</button>
+              <div style="width:32px"></div>
+            </div>
+            <!-- Trig -->
+            <div class="key-row">
+              <button class="key key-dark" onclick="calcKey('x⁻¹')"><span class="key-top">MTX</span>x⁻¹</button>
+              <button class="key key-dark" onclick="calcKey('sin(')"><span class="key-top">sin⁻¹</span>sin</button>
+              <button class="key key-dark" onclick="calcKey('cos(')"><span class="key-top">cos⁻¹</span>cos</button>
+              <button class="key key-dark" onclick="calcKey('tan(')"><span class="key-top">tan⁻¹</span>tan</button>
+              <button class="key key-dark" onclick="calcKey('^')"><span class="key-top">π</span>^</button>
+            </div>
+            <!-- Log -->
+            <div class="key-row">
+              <button class="key key-dark" onclick="calcKey('x²')"><span class="key-top">√</span>x²</button>
+              <button class="key key-dark" onclick="calcKey(',')"><span class="key-top">EE</span>,</button>
+              <button class="key key-dark" onclick="calcKey('(')"><span class="key-top">i</span>(</button>
+              <button class="key key-dark" onclick="calcKey('log(')"><span class="key-top">10^</span>log</button>
+              <button class="key key-dark" onclick="calcKey('ln(')"><span class="key-top">e^x</span>ln</button>
+            </div>
+            <!-- 7 8 9 -->
+            <div class="key-row">
+              <button class="key key-dark" onclick="calcKey('7')">7</button>
+              <button class="key key-dark" onclick="calcKey('8')">8</button>
+              <button class="key key-dark" onclick="calcKey('9')">9</button>
+              <button class="key key-dark" onclick="calcKey('(')"><span class="key-top">{</span>(</button>
+              <button class="key key-dark" onclick="calcKey(')')"><span class="key-top">}</span>)</button>
+            </div>
+            <!-- 4 5 6 -->
+            <div class="key-row">
+              <button class="key key-dark" onclick="calcKey('4')">4</button>
+              <button class="key key-dark" onclick="calcKey('5')">5</button>
+              <button class="key key-dark" onclick="calcKey('6')">6</button>
+              <button class="key key-dark" onclick="calcKey('*')">×</button>
+              <button class="key key-dark" onclick="calcKey('/')">÷</button>
+            </div>
+            <!-- 1 2 3 -->
+            <div class="key-row">
+              <button class="key key-dark" onclick="calcKey('1')">1</button>
+              <button class="key key-dark" onclick="calcKey('2')">2</button>
+              <button class="key key-dark" onclick="calcKey('3')">3</button>
+              <button class="key key-dark" onclick="calcKey('+')">+</button>
+              <button class="key key-dark" onclick="calcKey('-')">-</button>
+            </div>
+            <!-- 0 . (-) ENTER -->
+            <div class="key-row">
+              <button class="key key-dark key-zero" onclick="calcKey('0')">0</button>
+              <button class="key key-dark" onclick="calcKey('.')">.</button>
+              <button class="key key-dark" onclick="calcNeg()">(-)</button>
+              <button class="key key-enter" onclick="calcEnter()">ENTER</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Onglets calc -->
+        <div class="calc-tabs">
+          <div class="calc-tab active" onclick="switchCalcTab('history',this)">📋 Historique</div>
+          <div class="calc-tab" onclick="switchCalcTab('graph',this)">📈 Grapheur</div>
+          <div class="calc-tab" onclick="switchCalcTab('conv',this)">🔄 Conv.</div>
+        </div>
+
+        <!-- Historique -->
+        <div id="calcTabHistory">
+          <div class="card-full">
+            <div class="card-head">Historique <button onclick="clearHistory()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:12px;">Effacer</button></div>
+            <div class="calc-panel-body"><div class="history-calc" id="calcHistory"><div style="font-size:12px;color:var(--text2);text-align:center">Aucun calcul</div></div></div>
+          </div>
+        </div>
+        <!-- Grapheur -->
+        <div id="calcTabGraph" style="display:none">
+          <div class="card-full">
+            <div class="card-head">Grapheur</div>
+            <div class="calc-panel-body">
+              <canvas id="graphCanvas" width="400" height="180"></canvas>
+              <div class="graph-controls">
+                <input type="text" class="graph-input" id="graphExpr" placeholder="sin(x), x^2..." value="sin(x)">
+                <button class="btn-graph" onclick="drawGraph()">Tracer</button>
+                <button class="btn-graph-clear" onclick="clearGraph()">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Conversions -->
+        <div id="calcTabConv" style="display:none">
+          <div class="card-full">
+            <div class="card-head">Conversions</div>
+            <div class="calc-panel-body">
+              <input type="number" id="convInput" class="graph-input" placeholder="Valeur" oninput="updateConversions()" style="width:100%;margin-bottom:8px">
+              <select id="convType" class="select-full" onchange="updateConversions()">
+                <option value="deg">Degrés → Radians</option>
+                <option value="rad">Radians → Degrés</option>
+                <option value="km">km → miles</option>
+                <option value="miles">miles → km</option>
+                <option value="kg">kg → livres</option>
+                <option value="lbs">livres → kg</option>
+                <option value="c">°C → °F</option>
+                <option value="f">°F → °C</option>
+              </select>
+              <div class="conv-grid">
+                <div class="conv-item"><div class="conv-label">Résultat</div><div class="conv-value" id="convResult">—</div></div>
+                <div class="conv-item"><div class="conv-label">Formule</div><div class="conv-value" id="convFormula" style="font-size:10px">—</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRADUCTEUR -->
+    <div class="page" id="page-traducteur">
+      <div class="lang-bar">
+        <select class="lang-select" id="sourceLang">
+          <option value="fr">🇫🇷 Français</option><option value="en">🇬🇧 Anglais</option>
+          <option value="es">🇪🇸 Espagnol</option><option value="de">🇩🇪 Allemand</option>
+          <option value="it">🇮🇹 Italien</option><option value="pt">🇵🇹 Portugais</option>
+          <option value="ru">🇷🇺 Russe</option><option value="zh">🇨🇳 Chinois</option>
+          <option value="ja">🇯🇵 Japonais</option><option value="ar">🇸🇦 Arabe</option>
+          <option value="tr">🇹🇷 Turc</option>
+        </select>
+        <button class="swap-btn" onclick="swapLangs()">⇄</button>
+        <select class="lang-select" id="targetLang">
+          <option value="en">🇬🇧 Anglais</option><option value="fr">🇫🇷 Français</option>
+          <option value="es">🇪🇸 Espagnol</option><option value="de">🇩🇪 Allemand</option>
+          <option value="it">🇮🇹 Italien</option><option value="pt">🇵🇹 Portugais</option>
+          <option value="ru">🇷🇺 Russe</option><option value="zh">🇨🇳 Chinois</option>
+          <option value="ja">🇯🇵 Japonais</option><option value="ar">🇸🇦 Arabe</option>
+          <option value="tr">🇹🇷 Turc</option>
+        </select>
+      </div>
+      <div class="trad-grid">
+        <div class="text-panel">
+          <div class="panel-head"><span>Texte source</span><div style="display:flex;gap:4px"><button class="icon-btn" onclick="clearTrad()">✕</button><button class="icon-btn" onclick="copyTrad('sourceText')">📋</button></div></div>
+          <textarea class="trad-textarea" id="sourceText" placeholder="Tapez votre texte..." oninput="updateCharCount()"></textarea>
+          <div class="char-count"><span id="charCount">0</span> car.</div>
+        </div>
+        <div class="text-panel">
+          <div class="panel-head"><span>Traduction</span><button class="icon-btn" onclick="copyTrad('resultText')">📋</button></div>
+          <textarea class="trad-textarea" id="resultText" placeholder="La traduction apparaîtra ici..." readonly></textarea>
+          <div class="char-count" id="resultCount">—</div>
+        </div>
+      </div>
+      <div class="error-box" id="errorBox">❌ Erreur. Vérifiez votre connexion.</div>
+      <button class="btn-translate" id="translateBtn" onclick="doTranslate()">🌐 Traduire</button>
+      <div class="section-label">Phrases rapides</div>
+      <div class="phrases">
+        <button class="phrase-btn" onclick="quickPhrase('Bonjour, comment allez-vous ?')">Bonjour</button>
+        <button class="phrase-btn" onclick="quickPhrase('Merci beaucoup !')">Merci</button>
+        <button class="phrase-btn" onclick="quickPhrase('Je ne comprends pas')">Pas compris</button>
+        <button class="phrase-btn" onclick="quickPhrase('Combien ça coûte ?')">Prix</button>
+      </div>
+      <div class="section-label">Historique</div>
+      <div class="trad-history" id="tradHistory"><div style="font-size:12px;color:var(--text2)">Aucune traduction.</div></div>
+    </div>
+
+    <!-- DISCORD -->
+    <div class="page" id="page-discord">
+      <div id="backendAlert" class="backend-alert" style="display:none">⚠ Backend non détecté — lancez <strong>node server.js</strong></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--discord),#7289da);display:flex;align-items:center;justify-content:center;font-size:18px;color:white;font-weight:700">N</div>
+          <div><div style="font-size:13px;font-weight:600" id="botTagDisplay">Los Galactique Protect</div><div style="font-size:11px;color:var(--green)" id="botPingDisplay">Ping: —</div></div>
+        </div>
+        <button onclick="loadGuilds()" style="background:var(--discord);border:none;border-radius:8px;padding:7px 12px;color:white;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;">↻ Actu.</button>
+      </div>
+      <div class="section-label">Serveurs</div>
+      <div class="guilds-grid" id="guildsGrid"><div style="font-size:12px;color:var(--text2)">Chargement...</div></div>
+      <div id="guildDetail" style="display:none">
+        <div class="guild-detail">
+          <div class="guild-detail-head"><div style="font-size:14px;font-weight:700" id="selectedGuildName">—</div><button class="refresh-btn" onclick="loadSelectedGuild()">↻</button></div>
+          <div class="guild-stats-row">
+            <div class="guild-stat"><div class="guild-stat-value" id="guildStatMembers">—</div><div class="guild-stat-label">Membres</div></div>
+            <div class="guild-stat"><div class="guild-stat-value" id="guildStatOnline">—</div><div class="guild-stat-label">En ligne</div></div>
+            <div class="guild-stat"><div class="guild-stat-value" id="guildStatChannels">—</div><div class="guild-stat-label">Salons</div></div>
+            <div class="guild-stat"><div class="guild-stat-value" id="guildStatRoles">—</div><div class="guild-stat-label">Rôles</div></div>
+          </div>
+        </div>
+        <div class="discord-panels">
+          <div class="discord-panel"><div class="discord-panel-head">🛡️ Logs <button class="refresh-btn" onclick="loadSelectedLogs()">↻</button></div><div class="log-list" id="selectedLogList"><div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Chargement...</div></div></div>
+          <div class="discord-panel"><div class="discord-panel-head">👥 Membres <button class="refresh-btn" onclick="loadSelectedMembers()">↻</button></div><div class="member-list" id="selectedMemberList"><div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Chargement...</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SÉCURITÉ -->
+    <div class="page" id="page-securite">
+      <div class="coming-soon"><div class="big-icon">🛡️</div><h2>Sécurité</h2><p>Module disponible avec le backend actif.</p></div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="page" id="page-profil">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">🛡️</div>
+        <div class="profile-info"><h2 id="profileName">—</h2><p id="profileEmail">—</p><div class="profile-badge" id="profileBadge">Membre</div></div>
+      </div>
+      <div class="profile-card">
+        <h3>✏️ Modifier le profil</h3>
+        <div class="profile-field"><label>Prénom</label><input type="text" id="editFirstname"/></div>
+        <div class="profile-field"><label>Nom</label><input type="text" id="editLastname"/></div>
+        <div class="profile-field"><label>Identifiant</label><input type="text" id="editUsername"/></div>
+        <div class="profile-field"><label>Email</label><input type="email" id="editEmail"/></div>
+        <div class="profile-field"><label>Avatar</label><div class="avatar-row" id="editAvatarRow">
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'🛡️')">🛡️</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'⚡')">⚡</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'🔥')">🔥</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'🌟')">🌟</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'🎮')">🎮</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'🤖')">🤖</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'👑')">👑</div>
+          <div class="avatar-opt" onclick="selectEditAvatar(this,'🎵')">🎵</div>
+        </div></div>
+        <button class="btn-save" onclick="saveProfile()">💾 Sauvegarder</button>
+      </div>
+      <div class="profile-card">
+        <h3>🔒 Changer le mot de passe</h3>
+        <div class="profile-field"><label>Actuel</label><input type="password" id="oldPwd"/></div>
+        <div class="profile-field"><label>Nouveau</label><input type="password" id="newPwd"/></div>
+        <div class="profile-field"><label>Confirmer</label><input type="password" id="newPwd2"/></div>
+        <button class="btn-save" onclick="changePassword()">🔒 Changer</button>
+      </div>
+      <div class="profile-card">
+        <h3>📊 Informations</h3>
+        <div class="session-item"><span style="color:var(--text2)">Membre depuis</span><span id="memberSince" style="font-family:var(--mono);font-size:11px">—</span></div>
+        <div class="session-item"><span style="color:var(--text2)">Dernière connexion</span><span id="lastLogin" style="font-family:var(--mono);font-size:11px">—</span></div>
+        <div class="session-item" style="border:none"><span style="color:var(--text2)">Comptes</span><span id="accountCount" style="font-family:var(--mono);font-size:11px">—</span></div>
+        <div style="margin-top:12px"><button class="btn-danger" onclick="deleteAccount()">🗑️ Supprimer mon compte</button></div>
+      </div>
+    </div>
+
+    <!-- SOON PAGES -->
+    <div class="page" id="page-ia"><div class="coming-soon"><div class="big-icon">🤖</div><h2>Assistant IA</h2><p>Claude AI — Bientôt disponible</p></div></div>
+    <div class="page" id="page-notes"><div class="coming-soon"><div class="big-icon">📝</div><h2>Notes</h2><p>Bientôt disponible</p></div></div>
+    <div class="page" id="page-fichiers"><div class="coming-soon"><div class="big-icon">📁</div><h2>Fichiers</h2><p>Bientôt disponible</p></div></div>
+    <div class="page" id="page-taches"><div class="coming-soon"><div class="big-icon">✅</div><h2>Tâches</h2><p>Bientôt disponible</p></div></div>
+    <div class="page" id="page-passwords"><div class="coming-soon"><div class="big-icon">🔐</div><h2>Passwords</h2><p>Bientôt disponible</p></div></div>
+
+  </div><!-- /content-area -->
+
+  <!-- More Menu -->
+  <div class="more-backdrop" id="moreBackdrop" onclick="closeMore()"></div>
+  <div class="more-menu" id="moreMenu">
+    <div class="more-item" onclick="goTo('securite');closeMore()"><span class="icon">🛡️</span> Sécurité</div>
+    <div class="more-item" onclick="goTo('ia');closeMore()"><span class="icon">🤖</span> Assistant IA <span class="badge-soon-sm">bientôt</span></div>
+    <div class="more-item" onclick="goTo('notes');closeMore()"><span class="icon">📝</span> Notes <span class="badge-soon-sm">bientôt</span></div>
+    <div class="more-item" onclick="goTo('fichiers');closeMore()"><span class="icon">📁</span> Fichiers <span class="badge-soon-sm">bientôt</span></div>
+    <div class="more-item" onclick="goTo('taches');closeMore()"><span class="icon">✅</span> Tâches <span class="badge-soon-sm">bientôt</span></div>
+    <div class="more-item" onclick="goTo('passwords');closeMore()"><span class="icon">🔐</span> Passwords <span class="badge-soon-sm">bientôt</span></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-dashboard" onclick="goTo('dashboard')">
+      <span class="nav-icon">⚡</span><span class="nav-label">Home</span>
+    </button>
+    <button class="nav-btn" id="nav-calc" onclick="goTo('calc')">
+      <span class="nav-icon">🧮</span><span class="nav-label">Calc</span>
+    </button>
+    <button class="nav-btn" id="nav-traducteur" onclick="goTo('traducteur')">
+      <span class="nav-icon">🌐</span><span class="nav-label">Trad.</span>
+    </button>
+    <button class="nav-btn" id="nav-discord" onclick="goTo('discord')">
+      <span class="nav-icon">💬</span><span class="nav-label">Discord</span>
+    </button>
+    <button class="nav-btn" id="nav-profil" onclick="goTo('profil')">
+      <span class="nav-icon">👤</span><span class="nav-label">Profil</span>
+    </button>
+    <button class="nav-btn" id="nav-more" onclick="toggleMore()">
+      <span class="nav-icon">⋯</span><span class="nav-label">Plus</span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ════════════ AUTH ════════════
+function getAccounts(){return JSON.parse(localStorage.getItem('lgp_accounts')||'[]');}
+function saveAccounts(a){localStorage.setItem('lgp_accounts',JSON.stringify(a));}
+function getCurrentUser(){return JSON.parse(localStorage.getItem('lgp_session')||sessionStorage.getItem('lgp_session')||'null');}
+function saveSession(u,r=true){if(r)localStorage.setItem('lgp_session',JSON.stringify(u));else sessionStorage.setItem('lgp_session',JSON.stringify(u));}
+function clearSession(){localStorage.removeItem('lgp_session');sessionStorage.removeItem('lgp_session');}
+async function hashPassword(p){const d=new TextEncoder().encode(p+'lgp_salt_2024');const h=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function showTab(t){document.querySelectorAll('.auth-tab').forEach((x,i)=>x.classList.toggle('active',(t==='login'&&i===0)||(t==='register'&&i===1)));document.getElementById('tabLogin').style.display=t==='login'?'block':'none';document.getElementById('tabRegister').style.display=t==='register'?'block':'none';}
+let selectedAvatar='🛡️',editAvatar='🛡️';
+function selectAvatar(el,e){document.querySelectorAll('#avatarRow .avatar-opt').forEach(a=>a.classList.remove('selected'));el.classList.add('selected');selectedAvatar=e;}
+function selectEditAvatar(el,e){document.querySelectorAll('#editAvatarRow .avatar-opt').forEach(a=>a.classList.remove('selected'));el.classList.add('selected');editAvatar=e;}
+function checkPasswordStrength(){const p=document.getElementById('regPwd').value;const bar=document.getElementById('pwdBar');const hint=document.getElementById('pwdHint');let s=0;if(p.length>=8)s++;if(p.length>=12)s++;if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;const l=[{w:'0%',c:'var(--red)',t:'Trop court'},{w:'25%',c:'var(--red)',t:'Faible'},{w:'50%',c:'var(--amber)',t:'Moyen'},{w:'75%',c:'var(--amber)',t:'Bon'},{w:'100%',c:'var(--green)',t:'Excellent !'}][Math.min(s,4)];bar.style.width=l.w;bar.style.background=l.c;hint.textContent=l.t;}
+function checkUsername(){const u=document.getElementById('regUsername').value.trim();const exists=getAccounts().find(a=>a.username.toLowerCase()===u.toLowerCase());document.getElementById('regUsername').style.borderColor=exists?'var(--red)':u?'var(--green)':'';}
+async function doRegister(){const fn=document.getElementById('regFirstname').value.trim(),ln=document.getElementById('regLastname').value.trim(),un=document.getElementById('regUsername').value.trim(),em=document.getElementById('regEmail').value.trim(),p=document.getElementById('regPwd').value,p2=document.getElementById('regPwd2').value;const err=document.getElementById('registerError'),suc=document.getElementById('registerSuccess');err.classList.remove('show');suc.classList.remove('show');if(!fn||!ln||!un||!em||!p){err.textContent='❌ Tous les champs sont obligatoires.';err.classList.add('show');return;}if(!/^[a-zA-Z0-9_]{3,20}$/.test(un)){err.textContent='❌ Identifiant : 3-20 caractères';err.classList.add('show');return;}if(p.length<8){err.textContent='❌ Mot de passe trop court.';err.classList.add('show');return;}if(p!==p2){err.textContent='❌ Mots de passe différents.';err.classList.add('show');return;}const accounts=getAccounts();if(accounts.find(a=>a.username.toLowerCase()===un.toLowerCase())){err.textContent='❌ Identifiant déjà pris.';err.classList.add('show');return;}if(accounts.find(a=>a.email.toLowerCase()===em.toLowerCase())){err.textContent='❌ Email déjà utilisé.';err.classList.add('show');return;}const hp=await hashPassword(p);const na={id:Date.now().toString(),firstname:fn,lastname:ln,username:un,email:em,password:hp,avatar:selectedAvatar,role:accounts.length===0?'Administrateur':'Membre',createdAt:new Date().toLocaleDateString('fr-FR'),lastLogin:new Date().toLocaleString('fr-FR')};accounts.push(na);saveAccounts(accounts);suc.textContent='✅ Compte créé ! Connexion...';suc.classList.add('show');setTimeout(()=>{saveSession(na,true);loadApp(na);},1200);}
+async function doLogin(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPwd').value,rem=document.getElementById('rememberMe').checked;const err=document.getElementById('loginError');err.classList.remove('show');if(!u||!p){err.textContent='❌ Remplissez tous les champs.';err.classList.add('show');return;}if((u==='nathan'||u==='admin')&&p==='nathan123'){const au={id:'0',firstname:'Nathan',lastname:'Admin',username:'nathan',email:'admin@lgp.fr',avatar:'👑',role:'Super Admin',createdAt:'2024-01-01',lastLogin:new Date().toLocaleString('fr-FR')};saveSession(au,rem);loadApp(au);return;}const hp=await hashPassword(p);const acc=getAccounts();const found=acc.find(a=>(a.username.toLowerCase()===u.toLowerCase()||a.email.toLowerCase()===u.toLowerCase())&&a.password===hp);if(!found){err.textContent='❌ Identifiants incorrects.';err.classList.add('show');return;}found.lastLogin=new Date().toLocaleString('fr-FR');saveAccounts(acc);saveSession(found,rem);loadApp(found);}
+function showForgot(){const em=prompt('Entrez votre email :');if(!em)return;const found=getAccounts().find(a=>a.email.toLowerCase()===em.toLowerCase());alert(found?'✅ Email envoyé à '+em:'❌ Aucun compte trouvé.');}
+function loadApp(user){document.getElementById('loginPage').style.display='none';document.getElementById('app').classList.add('active');document.getElementById('profileAvatar').textContent=user.avatar||'🛡️';document.getElementById('profileName').textContent=`${user.firstname} ${user.lastname}`;document.getElementById('profileEmail').textContent=user.email;document.getElementById('profileBadge').textContent=user.role||'Membre';document.getElementById('editFirstname').value=user.firstname||'';document.getElementById('editLastname').value=user.lastname||'';document.getElementById('editUsername').value=user.username||'';document.getElementById('editEmail').value=user.email||'';document.getElementById('memberSince').textContent=user.createdAt||'—';document.getElementById('lastLogin').textContent=user.lastLogin||'—';document.getElementById('accountCount').textContent=getAccounts().length+' compte(s)';editAvatar=user.avatar||'🛡️';document.querySelectorAll('#editAvatarRow .avatar-opt').forEach(el=>el.classList.toggle('selected',el.textContent===editAvatar));checkBackend();}
+function doLogout(){clearSession();document.getElementById('app').classList.remove('active');document.getElementById('loginPage').style.display='flex';}
+function saveProfile(){const user=getCurrentUser();if(!user)return;const accounts=getAccounts();const idx=accounts.findIndex(a=>a.id===user.id);if(idx>=0){accounts[idx].firstname=document.getElementById('editFirstname').value;accounts[idx].lastname=document.getElementById('editLastname').value;accounts[idx].email=document.getElementById('editEmail').value;accounts[idx].avatar=editAvatar;saveAccounts(accounts);saveSession(accounts[idx],true);loadApp(accounts[idx]);}alert('✅ Profil mis à jour !');}
+async function changePassword(){const user=getCurrentUser();if(!user||user.id==='0'){alert('❌ Non disponible pour le compte admin.');return;}const o=document.getElementById('oldPwd').value,n1=document.getElementById('newPwd').value,n2=document.getElementById('newPwd2').value;if(!o||!n1||!n2){alert('❌ Remplissez tous les champs.');return;}if(n1!==n2){alert('❌ Mots de passe différents.');return;}if(n1.length<8){alert('❌ Mot de passe trop court.');return;}const accounts=getAccounts();const idx=accounts.findIndex(a=>a.id===user.id);if(idx<0)return;const oh=await hashPassword(o);if(accounts[idx].password!==oh){alert('❌ Mot de passe actuel incorrect.');return;}accounts[idx].password=await hashPassword(n1);saveAccounts(accounts);alert('✅ Mot de passe modifié !');}
+function deleteAccount(){const user=getCurrentUser();if(!user||user.id==='0'){alert('❌ Non disponible.');return;}if(!confirm(`Supprimer "${user.username}" ?`))return;saveAccounts(getAccounts().filter(a=>a.id!==user.id));doLogout();}
+window.addEventListener('load',()=>{const u=getCurrentUser();if(u)loadApp(u);});
+
+// ════════════ CALCULATRICE ════════════
+let calcExpr='',calcHistoryArr=[],is2nd=false,isAlpha=false,isRad=false;
+function calcKey(k){const display={'x²':'²','*':'×','/':'÷','x⁻¹':'⁻¹','sin(':is2nd?'asin(':'sin(','cos(':is2nd?'acos(':'cos(','tan(':is2nd?'atan(':'tan(','log(':is2nd?'10^(':'log(','ln(':is2nd?'e^(':'ln('};const val=display[k]||k;calcExpr+=val;document.getElementById('calcExpr').textContent=calcExpr;if(is2nd)toggle2nd();}
+function calcDel(){calcExpr=calcExpr.slice(0,-1);document.getElementById('calcExpr').textContent=calcExpr;}
+function calcClear(){calcExpr='';document.getElementById('calcExpr').textContent='';document.getElementById('calcResult').textContent='0';}
+function calcNeg(){calcExpr+='-';document.getElementById('calcExpr').textContent=calcExpr;}
+function calcEnter(){if(!calcExpr.trim())return;try{let expr=calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/²/g,'**2').replace(/⁻¹/g,'**(-1)').replace(/sin\(/g,isRad?'Math.sin(':'Math.sin(Math.PI/180*').replace(/cos\(/g,isRad?'Math.cos(':'Math.cos(Math.PI/180*').replace(/tan\(/g,isRad?'Math.tan(':'Math.tan(Math.PI/180*').replace(/asin\(/g,isRad?'Math.asin(':'(180/Math.PI)*Math.asin(').replace(/acos\(/g,isRad?'Math.acos(':'(180/Math.PI)*Math.acos(').replace(/atan\(/g,isRad?'Math.atan(':'(180/Math.PI)*Math.atan(').replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(').replace(/10\^\(/g,'Math.pow(10,').replace(/e\^\(/g,'Math.exp(').replace(/\^/g,'**').replace(/π/g,'Math.PI').replace(/e(?![x])/g,'Math.E');const result=Function('"use strict";return ('+expr+')')();const formatted=Number.isInteger(result)?result.toString():parseFloat(result.toFixed(10)).toString();document.getElementById('calcResult').textContent=formatted;calcHistoryArr.unshift({expr:calcExpr,result:formatted});if(calcHistoryArr.length>20)calcHistoryArr.pop();renderCalcHistory();calcExpr='';document.getElementById('calcExpr').textContent='';}catch(e){document.getElementById('calcResult').textContent='ERR';setTimeout(()=>document.getElementById('calcResult').textContent='0',1500);}}
+function renderCalcHistory(){const el=document.getElementById('calcHistory');if(!calcHistoryArr.length){el.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center">Aucun calcul</div>';return;}el.innerHTML=calcHistoryArr.map((h,i)=>`<div class="history-entry" onclick="loadCalcHistory(${i})"><span class="history-expr">${h.expr}</span><span class="history-res">${h.result}</span></div>`).join('');}
+function loadCalcHistory(i){calcExpr=calcHistoryArr[i].expr;document.getElementById('calcExpr').textContent=calcExpr;document.getElementById('calcResult').textContent=calcHistoryArr[i].result;}
+function clearHistory(){calcHistoryArr=[];renderCalcHistory();}
+function toggle2nd(){is2nd=!is2nd;document.getElementById('btn2nd').style.background=is2nd?'linear-gradient(180deg,#f59e0b,#d97706)':'linear-gradient(180deg,#d97706,#b45309)';document.getElementById('calc2ndIndicator').style.display=is2nd?'inline':'none';}
+function toggleAlpha(){isAlpha=!isAlpha;document.getElementById('btnAlpha').style.background=isAlpha?'linear-gradient(180deg,#22c55e,#16a34a)':'linear-gradient(180deg,#16a34a,#15803d)';document.getElementById('calcAlphaIndicator').style.display=isAlpha?'inline':'none';}
+function toggleMode(){isRad=!isRad;document.getElementById('modeRad').classList.toggle('active',isRad);document.getElementById('modeDeg').classList.toggle('active',!isRad);document.getElementById('calcMode').textContent=isRad?'RAD':'DEG';}
+function calcNav(dir){if(dir==='up'&&calcHistoryArr.length){const h=calcHistoryArr[0];calcExpr=h.expr;document.getElementById('calcExpr').textContent=calcExpr;}}
+function calcFn(fn){alert(`${fn}: Fonctionnalité avancée TI-83`);}
+function openGraph(){switchCalcTab('graph',document.querySelectorAll('.calc-tab')[1]);}
+
+// Calc tabs
+function switchCalcTab(name,el){['history','graph','conv'].forEach(n=>{document.getElementById('calcTab'+n.charAt(0).toUpperCase()+n.slice(1)).style.display=n===name?'block':'none';});document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');if(name==='graph')setTimeout(drawGraph,100);}
+
+// ════════════ GRAPHEUR ════════════
+function drawGraph(){const canvas=document.getElementById('graphCanvas');if(!canvas)return;const ctx=canvas.getContext('2d');const W=canvas.width,H=canvas.height;const expr=document.getElementById('graphExpr').value.trim();if(!expr)return;ctx.fillStyle='#9db4a0';ctx.fillRect(0,0,W,H);const xMin=-10,xMax=10,yMin=-6,yMax=6;const toX=x=>(x-xMin)/(xMax-xMin)*W;const toY=y=>H-(y-yMin)/(yMax-yMin)*H;ctx.strokeStyle='rgba(0,0,0,0.15)';ctx.lineWidth=0.5;for(let x=Math.ceil(xMin);x<=xMax;x++){ctx.beginPath();ctx.moveTo(toX(x),0);ctx.lineTo(toX(x),H);ctx.stroke();}for(let y=Math.ceil(yMin);y<=yMax;y++){ctx.beginPath();ctx.moveTo(0,toY(y));ctx.lineTo(W,toY(y));ctx.stroke();}ctx.strokeStyle='rgba(0,0,0,0.5)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(toX(0),0);ctx.lineTo(toX(0),H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,toY(0));ctx.lineTo(W,toY(0));ctx.stroke();let safeExpr=expr.replace(/\^/g,'**').replace(/sin\(/g,'Math.sin(').replace(/cos\(/g,'Math.cos(').replace(/tan\(/g,'Math.tan(').replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(').replace(/sqrt\(/g,'Math.sqrt(').replace(/abs\(/g,'Math.abs(').replace(/π/g,'Math.PI').replace(/e(?![x])/g,'Math.E');ctx.strokeStyle='#1a5276';ctx.lineWidth=2;ctx.beginPath();let started=false;for(let px=0;px<W;px++){const x=xMin+(xMax-xMin)*px/W;try{const y=Function('"use strict";const x='+x+';return '+safeExpr)();if(isFinite(y)&&y>=yMin-1&&y<=yMax+1){const cy=toY(y);if(!started){ctx.moveTo(px,cy);started=true;}else ctx.lineTo(px,cy);}else started=false;}catch(e){started=false;}}ctx.stroke();}
+function clearGraph(){const canvas=document.getElementById('graphCanvas');const ctx=canvas.getContext('2d');ctx.fillStyle='#9db4a0';ctx.fillRect(0,0,canvas.width,canvas.height);}
+function updateConversions(){const val=parseFloat(document.getElementById('convInput').value);const type=document.getElementById('convType').value;if(isNaN(val)){document.getElementById('convResult').textContent='—';document.getElementById('convFormula').textContent='—';return;}const convs={deg:{fn:v=>v*Math.PI/180,formula:'× π/180',unit:'rad'},rad:{fn:v=>v*180/Math.PI,formula:'× 180/π',unit:'°'},km:{fn:v=>v*0.621371,formula:'× 0.621371',unit:'mi'},miles:{fn:v=>v*1.60934,formula:'× 1.60934',unit:'km'},kg:{fn:v=>v*2.20462,formula:'× 2.20462',unit:'lbs'},lbs:{fn:v=>v*0.453592,formula:'× 0.453592',unit:'kg'},c:{fn:v=>v*9/5+32,formula:'× 9/5 + 32',unit:'°F'},f:{fn:v=>(v-32)*5/9,formula:'- 32 × 5/9',unit:'°C'}};const c=convs[type];const result=c.fn(val);document.getElementById('convResult').textContent=parseFloat(result.toFixed(6))+' '+c.unit;document.getElementById('convFormula').textContent=c.formula;}
+
+// ════════════ TRADUCTEUR ════════════
+let tradHistory=[];
+function updateCharCount(){const t=document.getElementById('sourceText').value;document.getElementById('charCount').textContent=t.length;}
+function clearTrad(){document.getElementById('sourceText').value='';document.getElementById('resultText').value='';document.getElementById('charCount').textContent='0';document.getElementById('resultCount').textContent='—';}
+function copyTrad(id){const t=document.getElementById(id).value;if(t)navigator.clipboard.writeText(t).then(()=>alert('Copié !'));}
+function swapLangs(){const s=document.getElementById('sourceLang'),t=document.getElementById('targetLang'),tmp=s.value;s.value=t.value;t.value=tmp;const st=document.getElementById('sourceText').value,rt=document.getElementById('resultText').value;document.getElementById('sourceText').value=rt;document.getElementById('resultText').value=st;updateCharCount();}
+function quickPhrase(p){document.getElementById('sourceText').value=p;updateCharCount();}
+async function doTranslate(){const text=document.getElementById('sourceText').value.trim();if(!text)return;const btn=document.getElementById('translateBtn');const errBox=document.getElementById('errorBox');errBox.classList.remove('show');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Traduction...';const sl=document.getElementById('sourceLang').value;const tl=document.getElementById('targetLang').value;try{const url=`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sl}|${tl}`;const res=await fetch(url);const data=await res.json();if(data.responseStatus===200){const translated=data.responseData.translatedText;document.getElementById('resultText').value=translated;document.getElementById('resultCount').textContent=translated.length+' car.';tradHistory.unshift({src:sl,tgt:tl,text,translated});if(tradHistory.length>10)tradHistory.pop();renderTradHistory();}else{errBox.classList.add('show');}}catch(e){errBox.classList.add('show');}btn.disabled=false;btn.innerHTML='🌐 Traduire';}
+function renderTradHistory(){const el=document.getElementById('tradHistory');if(!tradHistory.length){el.innerHTML='<div style="font-size:12px;color:var(--text2)">Aucune traduction.</div>';return;}el.innerHTML=tradHistory.map(h=>`<div class="history-item" onclick="document.getElementById('sourceText').value='${h.text.replace(/'/g,"\\'")}';document.getElementById('resultText').value='${h.translated.replace(/'/g,"\\'")}';updateCharCount()"><div class="hist-langs">${h.src} → ${h.tgt}</div><div class="hist-text">${h.text.substring(0,60)}${h.text.length>60?'...':''}</div><div class="hist-trad">${h.translated.substring(0,60)}${h.translated.length>60?'...':''}</div></div>`).join('');}
+
+// ════════════ NAV ════════════
+const pageTitles={dashboard:'Dashboard',calc:'🧮 Calculatrice TI-83',traducteur:'Traducteur',ia:'Assistant IA',notes:'Notes',fichiers:'Fichiers',taches:'Tâches',passwords:'Passwords',discord:'💬 Bot Discord',securite:'🛡️ Sécurité',profil:'Mon profil'};
+const navPages=['dashboard','calc','traducteur','discord','profil'];
+function goTo(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.getElementById('pageTitle').textContent=pageTitles[id]||id;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('active');else document.getElementById('nav-more').classList.add('active');if(id==='discord')loadGuilds();if(id==='calc')setTimeout(()=>{drawGraph();},100);document.querySelector('.content-area').scrollTop=0;}
+function toggleMore(){const m=document.getElementById('moreMenu'),b=document.getElementById('moreBackdrop');m.classList.toggle('show');b.classList.toggle('show');}
+function closeMore(){document.getElementById('moreMenu').classList.remove('show');document.getElementById('moreBackdrop').classList.remove('show');}
+function toggleTheme(){const html=document.documentElement,isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.querySelectorAll('.theme-btn').forEach(b=>b.textContent=isDark?'🌙':'☀️');}
+
+// ════════════ BACKEND ════════════
+const API='http://localhost:3001/api';let selectedGuildId=null;
+async function checkBackend(){try{const res=await fetch(`${API}/status`);const data=await res.json();if(data.online){document.getElementById('backendStatus').textContent='● ON';document.getElementById('backendStatus').style.color='var(--green)';document.getElementById('botTagDisplay').textContent=data.username;document.getElementById('botPingDisplay').textContent=`Ping: ${data.ping}ms`;const ba=document.getElementById('backendAlert');if(ba)ba.style.display='none';}}catch(e){document.getElementById('backendStatus').textContent='●';document.getElementById('backendStatus').style.color='var(--amber)';const ba=document.getElementById('backendAlert');if(ba)ba.style.display='block';}}
+setInterval(checkBackend,15000);
+async function loadGuilds(){try{const res=await fetch(`${API}/guilds`);const guilds=await res.json();const grid=document.getElementById('guildsGrid');if(!guilds.length){grid.innerHTML='<div style="font-size:12px;color:var(--text2)">Aucun serveur.</div>';return;}grid.innerHTML=guilds.map(g=>`<div class="guild-card ${selectedGuildId===g.id?'active-guild':''}" onclick="selectGuild('${g.id}','${g.name.replace(/'/g,"\\'")}')"><div class="guild-icon-ph">${g.name.charAt(0)}</div><div><div class="guild-name">${g.name}</div><div class="guild-members">${g.memberCount} membres</div></div></div>`).join('');}catch(e){document.getElementById('guildsGrid').innerHTML='<div style="font-size:12px;color:var(--amber)">Backend non disponible.</div>';}}
+function selectGuild(id,name){selectedGuildId=id;document.getElementById('selectedGuildName').textContent=name;document.getElementById('guildDetail').style.display='block';loadGuilds();loadSelectedGuild();loadSelectedLogs();loadSelectedMembers();}
+async function loadSelectedGuild(){if(!selectedGuildId)return;try{const res=await fetch(`${API}/stats/${selectedGuildId}`);const d=await res.json();if(d.error)return;document.getElementById('guildStatMembers').textContent=d.memberCount;document.getElementById('guildStatOnline').textContent=d.online||'—';document.getElementById('guildStatChannels').textContent=d.channelCount;document.getElementById('guildStatRoles').textContent=d.roleCount;}catch(e){}}
+async function loadSelectedLogs(){if(!selectedGuildId)return;try{const res=await fetch(`${API}/logs/${selectedGuildId}`);const logs=await res.json();const list=document.getElementById('selectedLogList');if(!logs.length){list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Aucun log.</div>';return;}list.innerHTML=logs.map(l=>`<div class="log-item ${l.type}"><span style="font-size:13px;flex-shrink:0">${l.icon}</span><div style="flex:1"><div class="log-title">${l.title}</div><div class="log-time">${l.detail} • ${l.time}</div></div></div>`).join('');}catch(e){}}
+async function loadSelectedMembers(){if(!selectedGuildId)return;try{const res=await fetch(`${API}/members/${selectedGuildId}`);const members=await res.json();const list=document.getElementById('selectedMemberList');if(!members.length){list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px;text-align:center">Aucun membre.</div>';return;}list.innerHTML=members.map(m=>`<div class="member-item"><div class="member-avatar-ph">${m.username.charAt(0).toUpperCase()}</div><div style="flex:1"><div style="font-size:12px;font-weight:600">${m.username}</div><div style="font-size:10px;color:var(--text2)">${m.roles?.join(', ')||'Membre'}</div></div><div class="member-dot" style="background:${m.status==='online'?'var(--green)':m.status==='idle'?'var(--amber)':'#555'}"></div></div>`).join('');}catch(e){}}
+</script>
+</body>
+</html>
